@@ -49,7 +49,7 @@
   <header>
     <h1>THE <span>LITTER</span></h1>
     <span class="live">● LIVE</span>
-    <span class="day" id="day">day —</span>
+    <span class="day" id="day">Day —</span>
     <span class="badge" id="mode">…</span>
   </header>
 
@@ -90,7 +90,7 @@ async function tick() {
     const l = state.latest;
     $("mode").textContent = state.mock ? "mock vision" : "claude vision";
     $("mode").className = "badge " + (state.mock ? "mock" : "liveai");
-    if (BIRTH) $("day").textContent = "day " + (Math.floor((Date.now() - new Date(BIRTH)) / 864e5) + 1) + "/50";
+    if (BIRTH) $("day").textContent = "Day " + (Math.floor((Date.now() - new Date(BIRTH)) / 864e5) + 1);
     if (l) {
       $("commentary").textContent = l.commentary ?? "";
       $("scene").textContent = l.scene ?? "";
