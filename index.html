@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE LITTER — live</title>
+<style>
+  :root {
+    --bg: #0b0d12; --panel: #12151d; --edge: #1f2430; --text: #e8ebf2; --dim: #8891a5;
+    --accent: #ffb84d; --hot: #ff5c7a; --ok: #58d68d;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); color: var(--text); font: 15px/1.5 ui-monospace, "SF Mono", Menlo, monospace; padding: 20px; }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  header { display: flex; align-items: baseline; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+  h1 { font-size: 26px; letter-spacing: 3px; }
+  h1 span { color: var(--accent); }
+  .live { color: var(--hot); font-weight: bold; animation: blink 1.6s infinite; }
+  @keyframes blink { 50% { opacity: .35; } }
+  .day { color: var(--dim); }
+  .grid { display: grid; grid-template-columns: 1fr 380px; gap: 16px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--edge); border-radius: 10px; padding: 14px; }
+  .panel h2 { font-size: 12px; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; margin-bottom: 10px; }
+  .videobox { aspect-ratio: 16/9; background: #000; border-radius: 8px; display: grid; place-items: center; color: var(--dim); overflow: hidden; }
+  .videobox img, .videobox iframe { width: 100%; height: 100%; object-fit: cover; border: 0; }
+  .commentary { font-size: 18px; color: var(--accent); min-height: 3em; margin: 10px 0 4px; }
+  .scene { color: var(--dim); font-size: 13px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+  .stat { background: var(--bg); border: 1px solid var(--edge); border-radius: 8px; padding: 8px; text-align: center; }
+  .stat b { display: block; font-size: 20px; color: var(--text); }
+  .stat span { font-size: 11px; color: var(--dim); }
+  .hype { display: flex; gap: 4px; margin-top: 8px; }
+  .hype i { width: 22px; height: 8px; border-radius: 3px; background: var(--edge); }
+  .hype i.on { background: var(--hot); }
+  .feed { display: flex; flex-direction: column; gap: 8px; max-height: 480px; overflow-y: auto; }
+  .evt { background: var(--bg); border: 1px solid var(--edge); border-left: 3px solid var(--accent); border-radius: 6px; padding: 8px 10px; }
+  .evt.h4, .evt.h5 { border-left-color: var(--hot); }
+  .evt time { color: var(--dim); font-size: 11px; }
+  .evt .c { color: var(--dim); font-size: 12px; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--edge); color: var(--dim); }
+  .badge.mock { border-color: var(--accent); color: var(--accent); }
+  .badge.liveai { border-color: var(--ok); color: var(--ok); }
+  footer { margin-top: 16px; color: var(--dim); font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>THE <span>LITTER</span></h1>
+    <span class="live">● LIVE</span>
+    <span class="day" id="day">day —</span>
+    <span class="badge" id="mode">…</span>
+  </header>
+
+  <div class="grid">
+    <div>
+      <div class="panel">
+        <h2>Stream</h2>
+        <!-- Swap the img for your YouTube embed once public:
+             <iframe src="https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1" allow="autoplay"></iframe> -->
+        <div class="videobox"><img id="frame" alt="live frame" onerror="this.style.display='none'"></div>
+        <div class="commentary" id="commentary">Waiting for the Watcher…</div>
+        <div class="scene" id="scene"></div>
+        <div class="hype" id="hype"></div>
+        <div class="stats">
+          <div class="stat"><b id="kittens">–</b><span>kittens in frame</span></div>
+          <div class="stat"><b id="activity">–</b><span>activity</span></div>
+          <div class="stat"><b id="events">–</b><span>events</span></div>
+          <div class="stat"><b id="motion">–</b><span>motion</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Event Feed — AI Watcher</h2>
+      <div class="feed" id="feed"><span class="scene">No events yet. The blobs are warming up.</span></div>
+    </div>
+  </div>
+
+  <footer>Litter Watcher — every frame judged by AI. Steady state is boring; events are everything.</footer>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const API = "https://litter-api.boogaav.workers.dev";
+const BIRTH = "2026-08-31"; // birth date — powers the day X/50 counter
+
+async function tick() {
+  try {
+    const state = await (await fetch(API + "/api/state")).json();
+    const l = state.latest;
+    $("mode").textContent = state.mock ? "mock vision" : "claude vision";
+    $("mode").className = "badge " + (state.mock ? "mock" : "liveai");
+    if (BIRTH) $("day").textContent = "day " + (Math.floor((Date.now() - new Date(BIRTH)) / 864e5) + 1) + "/50";
+    if (l) {
+      $("commentary").textContent = l.commentary ?? "";
+      $("scene").textContent = l.scene ?? "";
+      $("kittens").textContent = l.kittens_visible ?? "–";
+      $("activity").textContent = l.activity_level ?? "–";
+      $("hype").innerHTML = [1,2,3,4,5].map(n => `<i class="${n <= (l.hype_level ?? 0) ? "on" : ""}"></i>`).join("");
+    }
+    $("events").textContent = state.totals?.events ?? 0;
+    $("motion").textContent = state.lastMotion ?? "–";
+
+    const events = await (await fetch(API + "/api/events")).json();
+    if (events.length) {
+      $("feed").innerHTML = events.map(e =>
+        `<div class="evt h${e.hype}"><time>${new Date(e.at).toLocaleTimeString()}</time> <b>${e.event}</b><div class="c">${e.commentary}</div></div>`
+      ).join("");
+    }
+    $("frame").style.display = "";
+    $("frame").src = API + "/frame.jpg?t=" + Date.now();
+  } catch {}
+}
+tick();
+setInterval(tick, 3000);
+</script>
+</body>
+</html>
