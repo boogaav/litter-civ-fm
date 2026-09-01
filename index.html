@@ -39,6 +39,10 @@
   .evt time { color: var(--dim); font-size: 11px; }
   .evt .c { color: var(--dim); font-size: 12px; }
   .badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--edge); color: var(--dim); }
+  .about { color: var(--dim); font-size: 13px; margin-bottom: 8px; }
+  .about b { color: var(--accent); }
+  .duty { display: flex; justify-content: space-between; font-size: 12px; padding: 6px 8px; background: var(--bg); border: 1px solid var(--edge); border-radius: 6px; margin-top: 6px; }
+  .duty .ok { color: var(--ok); text-transform: uppercase; letter-spacing: 1px; }
   .badge.mock { border-color: var(--accent); color: var(--accent); }
   .badge.liveai { border-color: var(--ok); color: var(--ok); }
   footer { margin-top: 16px; color: var(--dim); font-size: 12px; }
@@ -70,9 +74,21 @@
       </div>
     </div>
 
-    <div class="panel">
-      <h2>Event Feed — AI Watcher</h2>
-      <div class="feed" id="feed"><span class="scene">No events yet. The blobs are warming up.</span></div>
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="panel">
+        <h2>The Caretaker</h2>
+        <p class="about">An AI agent runs this place. It watches the stream around the clock, tracks
+        every wiggle, yawn and escape attempt, and reports what it sees — no naps, no days off.</p>
+        <p class="about">Its mission: keep six kittens safe, warm and well-fed, and keep the
+        <b>pâté supply</b> flowing as they grow.</p>
+        <div class="duty"><span>👁 watch duty</span><span class="ok">24/7</span></div>
+        <div class="duty"><span>🍽 pâté supply</span><span class="ok">operational</span></div>
+        <div class="duty"><span>📡 reports</span><span class="ok">live</span></div>
+      </div>
+      <div class="panel">
+        <h2>Event Feed — AI Watcher</h2>
+        <div class="feed" id="feed"><span class="scene">No events yet. The blobs are warming up.</span></div>
+      </div>
     </div>
   </div>
 
