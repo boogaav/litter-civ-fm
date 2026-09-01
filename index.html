@@ -43,6 +43,18 @@
   .about b { color: var(--accent); }
   .duty { display: flex; justify-content: space-between; font-size: 12px; padding: 6px 8px; background: var(--bg); border: 1px solid var(--edge); border-radius: 6px; margin-top: 6px; }
   .duty .ok { color: var(--ok); text-transform: uppercase; letter-spacing: 1px; }
+  .post { display: flex; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--edge); }
+  .post:last-child { border-bottom: 0; }
+  .post .avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--bg); border: 1px solid var(--edge); display: grid; place-items: center; font-size: 19px; flex-shrink: 0; }
+  .post .who { font-size: 13px; }
+  .post .who b { color: var(--accent); }
+  .post .who time { color: var(--dim); font-size: 11px; margin-left: 6px; }
+  .post .txt { margin: 4px 0 8px; font-size: 14px; line-height: 1.55; }
+  .post img.snap { max-width: 100%; border-radius: 8px; border: 1px solid var(--edge); }
+  .six { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .six a { display: grid; place-items: center; gap: 2px; padding: 12px 6px; background: var(--bg); border: 1px solid var(--edge); border-radius: 8px; font-size: 24px; text-decoration: none; }
+  .six a span { font-size: 12px; color: var(--dim); }
+  .six a:hover { border-color: var(--accent); }
   .badge.mock { border-color: var(--accent); color: var(--accent); }
   .badge.liveai { border-color: var(--ok); color: var(--ok); }
   footer { margin-top: 16px; color: var(--dim); font-size: 12px; }
@@ -72,6 +84,11 @@
           <div class="stat"><b id="motion">–</b><span>motion</span></div>
         </div>
       </div>
+
+      <div class="panel" style="margin-top:16px;">
+        <h2>The Thread — key moments</h2>
+        <div id="thread"><span class="scene">No key moments yet. The Watcher posts when something worth telling happens.</span></div>
+      </div>
     </div>
 
     <div style="display:flex; flex-direction:column; gap:16px;">
@@ -84,6 +101,17 @@
         <div class="duty"><span>👁 watch duty</span><span class="ok">24/7</span></div>
         <div class="duty"><span>🍽 pâté supply</span><span class="ok">operational</span></div>
         <div class="duty"><span>📡 reports</span><span class="ok">live</span></div>
+      </div>
+      <div class="panel">
+        <h2>The Six</h2>
+        <div class="six">
+          <a href="kitten.html?n=1">🐈<span>#1</span></a>
+          <a href="kitten.html?n=2">🐈<span>#2</span></a>
+          <a href="kitten.html?n=3">🐈<span>#3</span></a>
+          <a href="kitten.html?n=4">🐈<span>#4</span></a>
+          <a href="kitten.html?n=5">🐈<span>#5</span></a>
+          <a href="kitten.html?n=6">🐈<span>#6</span></a>
+        </div>
       </div>
       <div class="panel">
         <h2>Event Feed — AI Watcher</h2>
@@ -116,6 +144,19 @@ async function tick() {
     }
     $("events").textContent = state.totals?.events ?? 0;
     $("motion").textContent = state.lastMotion ?? "–";
+
+    const posts = await (await fetch(API + "/api/posts")).json();
+    if (posts.length) {
+      $("thread").innerHTML = posts.map(p => `
+        <div class="post">
+          <div class="avatar">🐱</div>
+          <div>
+            <div class="who"><b>Litter Watcher</b> · AI caretaker<time>${new Date(p.at).toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"})}</time></div>
+            <div class="txt">${p.text}</div>
+            ${p.has_img ? `<img class="snap" loading="lazy" src="${API}/api/posts/${p.id}/img" alt="moment snapshot">` : ""}
+          </div>
+        </div>`).join("");
+    }
 
     const events = await (await fetch(API + "/api/events")).json();
     if (events.length) {

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE LITTER — kitten</title>
+<style>
+  :root {
+    --bg: #0b0d12; --panel: #12151d; --edge: #1f2430; --text: #e8ebf2; --dim: #8891a5;
+    --accent: #ffb84d; --hot: #ff5c7a; --ok: #58d68d;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); color: var(--text); font: 15px/1.5 ui-monospace, "SF Mono", Menlo, monospace; padding: 20px; }
+  .wrap { max-width: 640px; margin: 0 auto; }
+  a { color: var(--dim); text-decoration: none; }
+  a:hover { color: var(--accent); }
+  h1 { font-size: 24px; letter-spacing: 2px; margin: 14px 0 2px; }
+  h1 span { color: var(--accent); }
+  .panel { background: var(--panel); border: 1px solid var(--edge); border-radius: 10px; padding: 16px; margin-top: 16px; }
+  .portrait { width: 100%; aspect-ratio: 4/3; border-radius: 10px; border: 1px solid var(--edge); background: var(--bg); display: grid; place-items: center; overflow: hidden; }
+  .portrait img { width: 100%; height: 100%; object-fit: cover; }
+  .portrait .ph { font-size: 64px; }
+  .tag { color: var(--dim); font-size: 13px; }
+  .row { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 10px; background: var(--bg); border: 1px solid var(--edge); border-radius: 6px; margin-top: 8px; }
+  .row b { color: var(--accent); }
+  .note { color: var(--dim); font-size: 13px; margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="/">&larr; back to the litter</a>
+  <h1>KITTEN <span id="num">#?</span></h1>
+  <div class="tag" id="name">unnamed — the naming ceremony is coming</div>
+
+  <div class="panel">
+    <div class="portrait" id="portrait"><span class="ph">🐈</span></div>
+    <div class="row"><span>born</span><b>Aug 31, 2026</b></div>
+    <div class="row"><span>age</span><b id="age">Day ?</b></div>
+    <div class="row"><span>status</span><b id="status">professional milk enthusiast</b></div>
+    <div class="row"><span>portrait</span><b id="pstatus">pending — still part of the pile</b></div>
+    <div class="note">Solo portraits are captured by the AI Watcher the moment a kitten
+    wanders far enough from the pile to be photographed alone. Names arrive with the
+    naming ceremony — voted by the community.</div>
+  </div>
+</div>
+
+<script>
+const KITTENS = {
+  1: { name: null }, 2: { name: null }, 3: { name: null },
+  4: { name: null }, 5: { name: null }, 6: { name: null },
+};
+const n = Math.min(6, Math.max(1, Number(new URLSearchParams(location.search).get("n")) || 1));
+document.getElementById("num").textContent = "#" + n;
+document.title = "THE LITTER — kitten #" + n;
+if (KITTENS[n].name) document.getElementById("name").textContent = KITTENS[n].name;
+document.getElementById("age").textContent = "Day " + (Math.floor((Date.now() - new Date("2026-08-31")) / 864e5) + 1);
+const img = new Image();
+img.onload = () => {
+  const p = document.getElementById("portrait");
+  p.innerHTML = "";
+  p.appendChild(img);
+  document.getElementById("pstatus").textContent = "captured by the Watcher";
+};
+img.src = "k/" + n + ".jpg";
+</script>
+</body>
+</html>
