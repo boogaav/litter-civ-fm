@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>THE LITTER — live</title>
+<meta name="description" content="An AI agent is raising six kittens, live, for 50 days. Every frame judged. The pâté must flow.">
+<meta property="og:title" content="THE LITTER — an AI is raising 6 kittens, live">
+<meta property="og:description" content="24/7 stream. AI caretaker. Six kittens, 50 days. The pâté must flow.">
+<meta property="og:image" content="https://litter.civ.fm/og.jpg">
+<meta property="og:url" content="https://litter.civ.fm/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@kittenpoc">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐈</text></svg>">
 <style>
   :root {
     --bg: #0b0d12; --panel: #12151d; --edge: #1f2430; --text: #e8ebf2; --dim: #8891a5;
@@ -58,6 +67,23 @@
   .badge.mock { border-color: var(--accent); color: var(--accent); }
   .badge.liveai { border-color: var(--ok); color: var(--ok); }
   footer { margin-top: 16px; color: var(--dim); font-size: 12px; }
+  .marquee { overflow: hidden; border-top: 1px solid var(--edge); border-bottom: 1px solid var(--edge); margin: 0 -20px 18px; background: var(--panel); }
+  .marquee .inner { display: inline-block; white-space: nowrap; padding: 7px 0; animation: slide 28s linear infinite; font-size: 12px; letter-spacing: 2px; color: var(--accent); }
+  @keyframes slide { to { transform: translateX(-50%); } }
+  .coinstrip { background: var(--panel); border: 1px solid var(--edge); border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; font-size: 13px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .coinstrip b { color: var(--accent); }
+  .coinstrip .warn { color: var(--hot); }
+  .coinstrip a { color: var(--ok); text-decoration: none; }
+  .bigstats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+  @media (max-width: 700px) { .bigstats { grid-template-columns: repeat(2, 1fr); } }
+  .bigstats .bs { background: var(--panel); border: 1px solid var(--edge); border-radius: 10px; padding: 12px; text-align: center; }
+  .bigstats .bs b { display: block; font-size: 26px; color: var(--accent); }
+  .bigstats .bs span { font-size: 11px; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; }
+  .steps .step { display: flex; gap: 12px; margin-top: 10px; }
+  .steps .n { color: var(--accent); font-size: 20px; font-weight: bold; }
+  .steps p { font-size: 13px; color: var(--dim); }
+  .steps p b { color: var(--text); }
+  .six a i { font-style: normal; font-size: 11px; color: var(--ok); }
 </style>
 </head>
 <body>
@@ -67,7 +93,23 @@
     <span class="live">● LIVE</span>
     <span class="day" id="day">Day —</span>
     <span class="badge" id="mode">…</span>
+    <a href="moments.html" class="badge" style="text-decoration:none">📸 moments</a>
   </header>
+
+  <div class="marquee"><div class="inner" id="marquee"></div></div>
+
+  <div class="coinstrip">
+    <b>$LITTER</b><span>— not launched yet.</span>
+    <span class="warn">Anyone selling you one today is scamming you.</span>
+    <span>Follow <a href="https://x.com/kittenpoc" target="_blank" rel="noopener">@kittenpoc</a> — holders of attention get in first.</span>
+  </div>
+
+  <div class="bigstats">
+    <div class="bs"><b id="bsDay">–</b><span>day</span></div>
+    <div class="bs"><b id="bsObs">–</b><span>AI observations</span></div>
+    <div class="bs"><b id="bsMoments">–</b><span>key moments</span></div>
+    <div class="bs"><b id="bsNaming">–</b><span>naming ceremony</span></div>
+  </div>
 
   <div class="grid">
     <div>
@@ -83,6 +125,13 @@
           <div class="stat"><b id="events">–</b><span>events</span></div>
           <div class="stat"><b id="motion">–</b><span>motion</span></div>
         </div>
+      </div>
+
+      <div class="panel steps" style="margin-top:16px;">
+        <h2>Three things, then you're caught up</h2>
+        <div class="step"><span class="n">01</span><p><b>An AI watches six kittens 24/7.</b> Every frame judged. Motion detected locally, moments understood by Claude.</p></div>
+        <div class="step"><span class="n">02</span><p><b>Key moments become content automatically.</b> Screenshots, thread posts, tweets to <a href="https://x.com/kittenpoc" style="color:var(--ok)">@kittenpoc</a> — the Watcher never sleeps.</p></div>
+        <div class="step"><span class="n">03</span><p><b>You choose your kitten.</b> Back one of The Six, help name them on Day 7, follow their story to adoption day.</p></div>
       </div>
 
       <div class="panel" style="margin-top:16px;">
@@ -105,12 +154,12 @@
       <div class="panel">
         <h2>The Six</h2>
         <div class="six">
-          <a href="kitten.html?n=1">🐈<span>#1</span></a>
-          <a href="kitten.html?n=2">🐈<span>#2</span></a>
-          <a href="kitten.html?n=3">🐈<span>#3</span></a>
-          <a href="kitten.html?n=4">🐈<span>#4</span></a>
-          <a href="kitten.html?n=5">🐈<span>#5</span></a>
-          <a href="kitten.html?n=6">🐈<span>#6</span></a>
+          <a href="kitten.html?n=1">🐈<span>#1</span><i></i></a>
+          <a href="kitten.html?n=2">🐈<span>#2</span><i></i></a>
+          <a href="kitten.html?n=3">🐈<span>#3</span><i></i></a>
+          <a href="kitten.html?n=4">🐈<span>#4</span><i></i></a>
+          <a href="kitten.html?n=5">🐈<span>#5</span><i></i></a>
+          <a href="kitten.html?n=6">🐈<span>#6</span><i></i></a>
         </div>
       </div>
       <div class="panel">
@@ -126,7 +175,27 @@
 <script>
 const $ = (id) => document.getElementById(id);
 const API = "https://litter-api.boogaav.workers.dev";
-const BIRTH = "2026-08-31"; // birth date — powers the day X/50 counter
+const BIRTH = "2026-08-31"; // birth date — powers the day counter
+const NAMING = "2026-09-06"; // day 7 — the naming ceremony
+
+const day = () => Math.floor((Date.now() - new Date(BIRTH)) / 864e5) + 1;
+const MANTRA = `AI ON WATCH 24/7 · SIX KITTENS · DAY ${day()} · THE PÂTÉ MUST FLOW · EVERY FRAME JUDGED · `;
+$("marquee").textContent = MANTRA.repeat(6);
+$("bsDay").textContent = day();
+const namingDays = Math.ceil((new Date(NAMING) - Date.now()) / 864e5);
+$("bsNaming").textContent = namingDays > 0 ? `in ${namingDays}d` : "LIVE";
+
+async function loadPledges() {
+  try {
+    const pledges = await (await fetch(API + "/api/pledges")).json();
+    for (const p of pledges) {
+      const el = document.querySelector(`.six a[href="kitten.html?n=${p.kitten}"] i`);
+      if (el) el.textContent = p.count + " backers";
+    }
+  } catch {}
+}
+loadPledges();
+setInterval(loadPledges, 30000);
 
 async function tick() {
   try {
@@ -134,7 +203,9 @@ async function tick() {
     const l = state.latest;
     $("mode").textContent = state.mock ? "mock vision" : "claude vision";
     $("mode").className = "badge " + (state.mock ? "mock" : "liveai");
-    if (BIRTH) $("day").textContent = "Day " + (Math.floor((Date.now() - new Date(BIRTH)) / 864e5) + 1);
+    $("day").textContent = "Day " + day();
+    $("bsObs").textContent = state.observations ?? "–";
+    $("bsMoments").textContent = state.totals?.events ?? "–";
     if (l) {
       $("commentary").textContent = l.commentary ?? "";
       $("scene").textContent = l.scene ?? "";

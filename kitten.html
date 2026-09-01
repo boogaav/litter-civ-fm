@@ -24,6 +24,9 @@
   .row { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 10px; background: var(--bg); border: 1px solid var(--edge); border-radius: 6px; margin-top: 8px; }
   .row b { color: var(--accent); }
   .note { color: var(--dim); font-size: 13px; margin-top: 12px; }
+  .pledge { width: 100%; margin-top: 14px; padding: 12px; font: inherit; font-size: 15px; letter-spacing: 1px; color: var(--bg); background: var(--accent); border: 0; border-radius: 8px; cursor: pointer; }
+  .pledge:disabled { background: var(--edge); color: var(--dim); cursor: default; }
+  .backers { text-align: center; color: var(--ok); font-size: 13px; margin-top: 8px; }
 </style>
 </head>
 <body>
@@ -41,6 +44,8 @@
     <div class="note">Solo portraits are captured by the AI Watcher the moment a kitten
     wanders far enough from the pile to be photographed alone. Names arrive with the
     naming ceremony — voted by the community.</div>
+    <button class="pledge" id="pledge">BACK THIS KITTEN</button>
+    <div class="backers" id="backers"></div>
   </div>
 </div>
 
@@ -54,6 +59,36 @@ document.getElementById("num").textContent = "#" + n;
 document.title = "THE LITTER — kitten #" + n;
 if (KITTENS[n].name) document.getElementById("name").textContent = KITTENS[n].name;
 document.getElementById("age").textContent = "Day " + (Math.floor((Date.now() - new Date("2026-08-31")) / 864e5) + 1);
+const API = "https://litter-api.boogaav.workers.dev";
+const btn = document.getElementById("pledge");
+const backersEl = document.getElementById("backers");
+
+function renderCounts(pledges) {
+  const mine = pledges.find((p) => p.kitten === n);
+  backersEl.textContent = mine ? `${mine.count} backers` : "be the first backer";
+}
+fetch(API + "/api/pledges").then((r) => r.json()).then(renderCounts).catch(() => {});
+
+let pledged = false;
+try { pledged = localStorage.getItem("pledged-" + n) === "1"; } catch {}
+if (pledged) { btn.disabled = true; btn.textContent = "YOU BACK KITTEN #" + n; }
+
+btn.onclick = async () => {
+  btn.disabled = true;
+  try {
+    const pledges = await (await fetch(API + "/pledge", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ kitten: n }),
+    })).json();
+    renderCounts(pledges);
+    btn.textContent = "YOU BACK KITTEN #" + n;
+    try { localStorage.setItem("pledged-" + n, "1"); } catch {}
+  } catch {
+    btn.disabled = false;
+  }
+};
+
 const img = new Image();
 img.onload = () => {
   const p = document.getElementById("portrait");
