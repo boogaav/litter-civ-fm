@@ -84,6 +84,11 @@
   .steps p { font-size: 13px; color: var(--dim); }
   .steps p b { color: var(--text); }
   .six a i { font-style: normal; font-size: 11px; color: var(--ok); }
+  .pledge { margin-top: 10px; padding: 12px; font: inherit; font-size: 15px; letter-spacing: 1px; color: var(--bg); background: var(--accent); border: 0; border-radius: 8px; cursor: pointer; font-weight: bold; }
+  #wall .sup { font-size: 12px; padding: 6px 8px; border-bottom: 1px solid var(--edge); }
+  #wall .sup:last-child { border-bottom: 0; }
+  #wall .sup b { color: var(--accent); }
+  #wall .sup span { color: var(--dim); }
 </style>
 </head>
 <body>
@@ -141,6 +146,15 @@
     </div>
 
     <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="panel" id="fund" style="display:none;">
+        <h2>The Pâté Fund</h2>
+        <p class="about">This is how the litter eats. Every contribution buys real food for the mother
+        and her six — and the Watcher thanks every provider by name.</p>
+        <a class="pledge" id="fundBtn" style="display:block; text-align:center; text-decoration:none;" target="_blank" rel="noopener">🥫 SUPPLY PÂTÉ</a>
+        <div class="duty"><span>🥫 fund total</span><span class="ok" id="fundTotal">$0</span></div>
+        <div id="wall"></div>
+      </div>
+
       <div class="panel">
         <h2>The Caretaker</h2>
         <p class="about">An AI agent runs this place. It watches the stream around the clock, tracks
@@ -184,6 +198,25 @@ $("marquee").textContent = MANTRA.repeat(6);
 $("bsDay").textContent = day();
 const namingDays = Math.ceil((new Date(NAMING) - Date.now()) / 864e5);
 $("bsNaming").textContent = namingDays > 0 ? `in ${namingDays}d` : "LIVE";
+
+const KOFI_URL = null; // set to the Ko-fi page URL to switch on the Pâté Fund
+
+async function loadFund() {
+  if (!KOFI_URL) return;
+  $("fund").style.display = "";
+  $("fundBtn").href = KOFI_URL;
+  try {
+    const f = await (await fetch(API + "/api/supporters")).json();
+    $("fundTotal").textContent = "$" + (f.total ?? 0) + " · " + (f.count ?? 0) + " providers";
+    if (f.supporters?.length) {
+      $("wall").innerHTML = f.supporters.slice(0, 10).map(s =>
+        `<div class="sup"><b>${s.name}</b> supplied ${s.currency} ${s.amount}${s.message ? ` — <span>${s.message}</span>` : ""}</div>`
+      ).join("");
+    }
+  } catch {}
+}
+loadFund();
+setInterval(loadFund, 60000);
 
 async function loadPledges() {
   try {
