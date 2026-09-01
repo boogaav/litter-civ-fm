@@ -57,9 +57,7 @@
     <div>
       <div class="panel">
         <h2>Stream</h2>
-        <!-- Swap the img for your YouTube embed once public:
-             <iframe src="https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1" allow="autoplay"></iframe> -->
-        <div class="videobox"><img id="frame" alt="live frame" onerror="this.style.display='none'"></div>
+        <div class="videobox"><iframe src="https://www.youtube.com/embed/MaVJGJLKu10?autoplay=1&mute=1" title="The LITTER live stream" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
         <div class="commentary" id="commentary">Waiting for the Watcher…</div>
         <div class="scene" id="scene"></div>
         <div class="hype" id="hype"></div>
@@ -109,8 +107,6 @@ async function tick() {
         `<div class="evt h${e.hype}"><time>${new Date(e.at).toLocaleTimeString()}</time> <b>${e.event}</b><div class="c">${e.commentary}</div></div>`
       ).join("");
     }
-    $("frame").style.display = "";
-    $("frame").src = API + "/frame.jpg?t=" + Date.now();
   } catch {}
 }
 tick();
