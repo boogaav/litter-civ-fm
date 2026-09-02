@@ -89,6 +89,15 @@
   #wall .sup:last-child { border-bottom: 0; }
   #wall .sup b { color: var(--accent); }
   #wall .sup span { color: var(--dim); }
+  .mrow { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 8px; background: var(--bg); border: 1px solid var(--edge); border-radius: 6px; margin-top: 6px; }
+  .mrow b { color: var(--accent); }
+  .pate { margin-top: 10px; padding: 10px; background: var(--bg); border: 1px solid var(--accent); border-radius: 8px; }
+  .patehead { font-size: 14px; } .patehead b { color: var(--accent); font-size: 18px; }
+  .patesub { font-size: 11px; color: var(--dim); margin-top: 3px; }
+  .tape { margin-top: 10px; max-height: 150px; overflow-y: auto; }
+  .tape .tr { font-size: 12px; padding: 4px 6px; border-bottom: 1px solid var(--edge); display: flex; justify-content: space-between; }
+  .tape .tr:last-child { border-bottom: 0; }
+  .tape .buy { color: var(--ok); } .tape .sell { color: var(--hot); }
 </style>
 </head>
 <body>
@@ -105,9 +114,10 @@
   <div class="marquee"><div class="inner" id="marquee"></div></div>
 
   <div class="coinstrip">
-    <b>$LITTER</b><span>— not launched yet.</span>
-    <span class="warn">Anyone selling you one today is scamming you.</span>
-    <span>Follow <a href="https://x.com/kittenpoc" target="_blank" rel="noopener">@kittenpoc</a> — holders of attention get in first.</span>
+    <b>$LITTER</b>
+    <span id="ca" style="cursor:pointer" title="click to copy">CA: 0xAa2A…2b3A 📋</span>
+    <span class="warn">only this address — everything else is a fake.</span>
+    <a href="https://www.ponsfamily.com/launchpad/0xAa2A90777994A29d659f1DEEB2E21Ae7de312b3A" target="_blank" rel="noopener">trade on pons ↗</a>
   </div>
 
   <div class="bigstats">
@@ -147,6 +157,22 @@
     </div>
 
     <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="panel" id="market" style="display:none;">
+        <h2>$LITTER — The Trading Post</h2>
+        <div class="mrow"><span>price</span><b id="mPrice">–</b></div>
+        <div class="mrow"><span>market cap</span><b id="mMcap">–</b></div>
+        <div class="mrow"><span>holders</span><b id="mHolders">–</b></div>
+        <div class="pate">
+          <div class="patehead">🥫 <b id="mCans">–</b> cans of pâté funded by traders</div>
+          <div class="patesub">every trade pays a fee · every fee feeds the litter (<span id="mFees">–</span> earned)</div>
+        </div>
+        <a class="pledge" id="mTrade" style="display:block; text-align:center; text-decoration:none;" target="_blank" rel="noopener"
+           href="https://www.ponsfamily.com/launchpad/0xAa2A90777994A29d659f1DEEB2E21Ae7de312b3A">🐾 TRADE $LITTER</a>
+        <div class="tape" id="mTape"></div>
+        <div class="patesub" style="margin-top:8px">bonding curve on pons · graduates to Uniswap at 4.2 ETH ·
+        memecoin, not an investment — it can go to zero. The fees really do buy the pâté.</div>
+      </div>
+
       <div class="panel" id="fund" style="display:none;">
         <h2>The Pâté Fund</h2>
         <p class="about">This is how the litter eats. Every contribution buys real food for the mother
@@ -196,11 +222,37 @@ const BIRTH = "2026-08-31"; // birth date — powers the day counter
 const NAMING = "2026-09-06"; // day 7 — the naming ceremony
 
 const day = () => Math.floor((Date.now() - new Date(BIRTH)) / 864e5) + 1;
-const MANTRA = `AI ON WATCH 24/7 · SIX KITTENS · DAY ${day()} · THE PÂTÉ MUST FLOW · EVERY FRAME JUDGED · `;
+const MANTRA = `AI ON WATCH 24/7 · SIX KITTENS · DAY ${day()} · THE PÂTÉ MUST FLOW · $LITTER FEES FEED THE LITTER · EVERY FRAME JUDGED · `;
+$("ca").onclick = () => {
+  navigator.clipboard.writeText("0xAa2A90777994A29d659f1DEEB2E21Ae7de312b3A");
+  $("ca").textContent = "CA copied ✓";
+  setTimeout(() => $("ca").textContent = "CA: 0xAa2A…2b3A 📋", 1500);
+};
 $("marquee").textContent = MANTRA.repeat(6);
 $("bsDay").textContent = day();
 const namingDays = Math.ceil((new Date(NAMING) - Date.now()) / 864e5);
 $("bsNaming").textContent = namingDays > 0 ? `in ${namingDays}d` : "LIVE";
+
+const fmtUsd = (v) => v >= 1e6 ? "$" + (v/1e6).toFixed(2) + "M" : v >= 1e3 ? "$" + (v/1e3).toFixed(1) + "k" : "$" + v.toFixed(v < 0.01 ? 7 : 2);
+
+async function loadMarket() {
+  try {
+    const m = await (await fetch(API + "/api/market")).json();
+    if (m.error) return;
+    $("market").style.display = "";
+    $("mPrice").textContent = fmtUsd(m.priceUsd);
+    $("mMcap").textContent = fmtUsd(m.mcapUsd);
+    $("mHolders").textContent = m.holders;
+    $("mCans").textContent = m.cans;
+    $("mFees").textContent = m.feesEth.toFixed(4) + " ETH";
+    const verb = (t) => t.side === "buy" ? "fed the bowl" : "coughed a hairball";
+    $("mTape").innerHTML = m.trades.map(t =>
+      `<div class="tr"><span class="${t.side}">${t.side === "buy" ? "🍖" : "🙀"} ${t.account} ${verb(t)}</span><span>${t.eth.toFixed(4)} ETH</span></div>`
+    ).join("");
+  } catch {}
+}
+loadMarket();
+setInterval(loadMarket, 20000);
 
 const KOFI_URL = null; // set to the Ko-fi page URL to switch on the Pâté Fund
 
