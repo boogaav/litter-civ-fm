@@ -27,11 +27,14 @@
   .pledge { width: 100%; margin-top: 14px; padding: 12px; font: inherit; font-size: 15px; letter-spacing: 1px; color: var(--bg); background: var(--accent); border: 0; border-radius: 8px; cursor: pointer; }
   .pledge:disabled { background: var(--edge); color: var(--dim); cursor: default; }
   .backers { text-align: center; color: var(--ok); font-size: 13px; margin-top: 8px; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--edge); color: var(--dim); }
+  .badge.liveai { border-color: var(--ok); color: var(--ok); }
+  .topbar { display: flex; justify-content: space-between; align-items: center; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <a href="/">&larr; back to the litter</a>
+  <div class="topbar"><a href="/">&larr; back to the litter</a><span id="walletBox"></span></div>
   <h1>KITTEN <span id="num">#?</span></h1>
   <div class="tag" id="name">unnamed — the naming ceremony is coming</div>
 
@@ -49,6 +52,7 @@
   </div>
 </div>
 
+<script src="wallet.js"></script>
 <script>
 const KITTENS = {
   1: { name: null }, 2: { name: null }, 3: { name: null },
@@ -69,21 +73,42 @@ function renderCounts(pledges) {
 }
 fetch(API + "/api/pledges").then((r) => r.json()).then(renderCounts).catch(() => {});
 
-let pledged = false;
-try { pledged = localStorage.getItem("pledged-" + n) === "1"; } catch {}
-if (pledged) { btn.disabled = true; btn.textContent = "YOU BACK KITTEN #" + n; }
+function syncButton() {
+  const s = walletSession();
+  if (s) {
+    btn.disabled = false;
+    btn.textContent = "BACK KITTEN #" + n + " AS " + shortAddr(s.address);
+    fetch(API + "/api/me", { headers: { authorization: "Bearer " + s.token } })
+      .then((r) => r.json())
+      .then((me) => { if (me.kitten === n) btn.textContent = "KITTEN #" + n + " IS YOURS 🐾"; })
+      .catch(() => {});
+  } else {
+    let pledged = false;
+    try { pledged = localStorage.getItem("pledged-" + n) === "1"; } catch {}
+    btn.disabled = pledged;
+    btn.textContent = pledged ? "YOU BACK KITTEN #" + n : "BACK THIS KITTEN";
+  }
+}
+mountWalletButton(syncButton);
+syncButton();
 
 btn.onclick = async () => {
   btn.disabled = true;
+  const s = walletSession();
   try {
+    const headers = { "content-type": "application/json" };
+    if (s) headers.authorization = "Bearer " + s.token;
     const pledges = await (await fetch(API + "/pledge", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ kitten: n }),
+      method: "POST", headers, body: JSON.stringify({ kitten: n }),
     })).json();
     renderCounts(pledges);
-    btn.textContent = "YOU BACK KITTEN #" + n;
-    try { localStorage.setItem("pledged-" + n, "1"); } catch {}
+    if (s) {
+      btn.textContent = "KITTEN #" + n + " IS YOURS 🐾";
+      btn.disabled = false;
+    } else {
+      btn.textContent = "YOU BACK KITTEN #" + n;
+      try { localStorage.setItem("pledged-" + n, "1"); } catch {}
+    }
   } catch {
     btn.disabled = false;
   }

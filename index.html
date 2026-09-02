@@ -99,6 +99,7 @@
     <span class="day" id="day">Day —</span>
     <span class="badge" id="mode">…</span>
     <a href="moments.html" class="badge" style="text-decoration:none">📸 moments</a>
+    <span id="walletBox" style="margin-left:auto"></span>
   </header>
 
   <div class="marquee"><div class="inner" id="marquee"></div></div>
@@ -186,8 +187,10 @@
   <footer>Litter Watcher — every frame judged by AI. Steady state is boring; events are everything.</footer>
 </div>
 
+<script src="wallet.js"></script>
 <script>
 const $ = (id) => document.getElementById(id);
+mountWalletButton();
 const API = "https://litter-api.boogaav.workers.dev";
 const BIRTH = "2026-08-31"; // birth date — powers the day counter
 const NAMING = "2026-09-06"; // day 7 — the naming ceremony
