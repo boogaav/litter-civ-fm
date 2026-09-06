@@ -232,7 +232,7 @@ $("ca").onclick = () => {
 $("marquee").textContent = MANTRA.repeat(6);
 $("bsDay").textContent = day();
 const namingDays = Math.ceil((new Date(NAMING) - Date.now()) / 864e5);
-$("bsNaming").textContent = namingDays > 0 ? `in ${namingDays}d` : "LIVE";
+$("bsNaming").textContent = namingDays > 0 ? `in ${namingDays}d` : "soon";
 
 const fmtUsd = (v) => v >= 1e6 ? "$" + (v/1e6).toFixed(2) + "M" : v >= 1e3 ? "$" + (v/1e3).toFixed(1) + "k" : "$" + v.toFixed(v < 0.01 ? 7 : 2);
 
