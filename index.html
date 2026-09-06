@@ -131,7 +131,8 @@
     <div>
       <div class="panel">
         <h2>Stream</h2>
-        <div class="videobox"><iframe src="https://www.youtube.com/embed/live_stream?channel=UCEZFtCnTWhypxCA9hWE9lJg&autoplay=1&mute=1" title="The LITTER live stream" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
+        <div class="videobox" id="videobox"><iframe src="https://www.youtube.com/embed/live_stream?channel=UCEZFtCnTWhypxCA9hWE9lJg&autoplay=1&mute=1" title="The LITTER live stream" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
+        <div id="xliveBar" style="display:none; margin-top:8px;"><a class="pledge" id="xliveBtn" style="display:block; text-align:center; text-decoration:none;" target="_blank" rel="noopener">▶ WATCH LIVE ON X</a></div>
         <div class="commentary" id="commentary">Waiting for the Watcher…</div>
         <div class="scene" id="scene"></div>
         <div class="hype" id="hype"></div>
@@ -253,6 +254,25 @@ async function loadMarket() {
 }
 loadMarket();
 setInterval(loadMarket, 20000);
+
+// Where the show is broadcasting. source: "youtube" (channel embed) | "x" (X live broadcast).
+// For X: X's player can't be iframed, so we show the pipeline's live frame (refreshed every 2s)
+// with a Watch-on-X button; if `tweet` is set, X's official embedded player is used instead.
+const LIVE = { source: "x", broadcast: "https://x.com/i/broadcasts/1AxRnZLDmDqxl", tweet: null };
+if (LIVE.source === "x") {
+  const box = $("videobox");
+  if (LIVE.tweet) {
+    box.innerHTML = `<blockquote class="twitter-tweet" data-theme="dark" data-conversation="none"><a href="${LIVE.tweet}"></a></blockquote>`;
+    box.style.aspectRatio = "auto"; box.style.background = "transparent";
+    const s = document.createElement("script"); s.src = "https://platform.twitter.com/widgets.js"; s.async = true; document.body.appendChild(s);
+  } else {
+    box.innerHTML = `<img id="liveFrame" alt="live frame" style="width:100%;height:100%;object-fit:cover">`;
+    setInterval(() => { $("liveFrame").src = API + "/frame.jpg?t=" + Date.now(); }, 2000);
+    $("liveFrame").src = API + "/frame.jpg?t=" + Date.now();
+  }
+  $("xliveBtn").href = LIVE.broadcast;
+  $("xliveBar").style.display = "";
+}
 
 const KOFI_URL = null; // set to the Ko-fi page URL to switch on the Pâté Fund
 
