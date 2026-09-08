@@ -232,33 +232,36 @@ function renderLeaderboard() {
   }).join("");
 }
 renderLeaderboard();
-async function loadPledges() {
-  try {
-    const pledges = await (await fetch(API + "/api/pledges")).json();
-    pledgeCounts = Object.fromEntries(pledges.map(p => [p.kitten, p.count]));
-    renderLeaderboard();
-  } catch {}
-}
-loadPledges();
-setInterval(loadPledges, 30000);
 
 const fmtUsd = (v) => v >= 1e6 ? "$" + (v/1e6).toFixed(2) + "M" : v >= 1e3 ? "$" + (v/1e3).toFixed(1) + "k" : "$" + v.toFixed(v < 0.01 ? 7 : 2);
-async function loadMarket() {
+function renderMarket(m) {
+  if (!m || m.error) return;
+  $("market").style.display = "";
+  $("mPrice").textContent = fmtUsd(m.priceUsd);
+  $("mMcap").textContent = fmtUsd(m.mcapUsd);
+  $("mHolders").textContent = m.holders;
+  $("mCans").textContent = m.cans;
+  $("mTape").innerHTML = m.trades.slice(0, 6).map(t =>
+    `<div class="tr"><span class="${t.side}">${t.side === "buy" ? "🍖" : "🙀"} ${t.account} ${t.side === "buy" ? "fed the bowl" : "coughed a hairball"}</span><span>${t.eth.toFixed(4)} ETH</span></div>`
+  ).join("");
+}
+
+// Polling budget: ONE /api/home request every 8s and one frame every 5s, only while the tab is
+// visible. (Workers free tier = 100k requests/day; the old design spent 61k per open tab.)
+const visible = () => document.visibilityState === "visible";
+async function pollHome() {
+  if (!visible()) return;
   try {
-    const m = await (await fetch(API + "/api/market")).json();
-    if (m.error) return;
-    $("market").style.display = "";
-    $("mPrice").textContent = fmtUsd(m.priceUsd);
-    $("mMcap").textContent = fmtUsd(m.mcapUsd);
-    $("mHolders").textContent = m.holders;
-    $("mCans").textContent = m.cans;
-    $("mTape").innerHTML = m.trades.slice(0, 6).map(t =>
-      `<div class="tr"><span class="${t.side}">${t.side === "buy" ? "🍖" : "🙀"} ${t.account} ${t.side === "buy" ? "fed the bowl" : "coughed a hairball"}</span><span>${t.eth.toFixed(4)} ETH</span></div>`
-    ).join("");
+    const h = await (await fetch(API + "/api/home")).json();
+    if (h.pledges) { pledgeCounts = Object.fromEntries(h.pledges.map(p => [p.kitten, p.count])); renderLeaderboard(); }
+    renderMarket(h.market);
+    renderState(h.state);
+    renderContent(h.posts, h.events);
   } catch {}
 }
-loadMarket();
-setInterval(loadMarket, 20000);
+pollHome();
+setInterval(pollHome, 8000);
+document.addEventListener("visibilitychange", () => { if (visible()) pollHome(); });
 
 // Where the show is broadcasting. source: "youtube" (channel embed) | "x" (X live broadcast).
 // X's player can't be iframed, so X mode shows the pipeline's live frame (2s refresh) + a Watch-on-X
@@ -272,8 +275,9 @@ if (LIVE.source === "x") {
     const s = document.createElement("script"); s.src = "https://platform.twitter.com/widgets.js"; s.async = true; document.body.appendChild(s);
   } else {
     box.innerHTML = `<img id="liveFrame" alt="live frame" style="width:100%;height:100%;object-fit:cover">`;
-    setInterval(() => { $("liveFrame").src = API + "/frame.jpg?t=" + Date.now(); }, 3000);
-    $("liveFrame").src = API + "/frame.jpg?t=" + Date.now();
+    const refreshFrame = () => { if (visible()) $("liveFrame").src = API + "/frame.jpg?t=" + Math.floor(Date.now() / 4000); };
+    setInterval(refreshFrame, 5000);
+    refreshFrame();
   }
   $("xliveBtn").href = LIVE.broadcast;
   $("xliveBar").style.display = "";
@@ -293,33 +297,27 @@ async function loadFund() {
 loadFund();
 setInterval(loadFund, 60000);
 
-async function tick() {
-  try {
-    const state = await (await fetch(API + "/api/state")).json();
-    const l = state.latest;
-    $("mode").textContent = state.mock ? "mock vision" : "claude vision";
-    $("mode").className = "badge " + (state.mock ? "mock" : "liveai");
-    $("day").textContent = "Day " + day();
-    $("bsObs").textContent = state.observations ?? "–";
-    $("bsMoments").textContent = state.totals?.events ?? "–";
-    if (l) {
-      $("commentary").textContent = l.commentary ?? "";
-      $("kittens").textContent = l.kittens_visible ?? "–";
-      $("activity").textContent = l.activity_level ?? "–";
-      $("hype").innerHTML = [1,2,3,4,5].map(n => `<i class="${n <= (l.hype_level ?? 0) ? "on" : ""}"></i>`).join("");
-    }
-    $("events").textContent = state.totals?.events ?? 0;
-    $("motion").textContent = state.lastMotion ?? "–";
-  } catch {}
+function renderState(state) {
+  if (!state) return;
+  const l = state.latest;
+  $("mode").textContent = state.mock ? "mock vision" : "claude vision";
+  $("mode").className = "badge " + (state.mock ? "mock" : "liveai");
+  $("day").textContent = "Day " + day();
+  $("bsObs").textContent = state.observations ?? "–";
+  $("bsMoments").textContent = state.totals?.events ?? "–";
+  if (l) {
+    $("commentary").textContent = l.commentary ?? "";
+    $("kittens").textContent = l.kittens_visible ?? "–";
+    $("activity").textContent = l.activity_level ?? "–";
+    $("hype").innerHTML = [1,2,3,4,5].map(n => `<i class="${n <= (l.hype_level ?? 0) ? "on" : ""}"></i>`).join("");
+  }
+  $("events").textContent = state.totals?.events ?? 0;
+  $("motion").textContent = state.lastMotion ?? "–";
 }
-tick();
-setInterval(tick, 5000);
 
-// Thread + feed change slowly — poll them far less often than the live state.
-async function tickContent() {
+function renderContent(posts, events) {
   try {
-    const posts = await (await fetch(API + "/api/posts")).json();
-    if (posts.length) {
+    if (posts?.length) {
       $("thread").innerHTML = posts.slice(0, 3).map(p => `
         <div class="post">
           <div class="avatar">🐱</div>
@@ -331,16 +329,13 @@ async function tickContent() {
         </div>`).join("") + `<a href="moments.html" style="color:var(--ok);font-size:12px;text-decoration:none">all moments →</a>`;
     }
 
-    const events = await (await fetch(API + "/api/events")).json();
-    if (events.length) {
+    if (events?.length) {
       $("feed").innerHTML = events.slice(0, 25).map(e =>
         `<div class="evt h${e.hype}"><time>${new Date(e.at).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"})}</time> ${e.event}</div>`
       ).join("");
     }
   } catch {}
 }
-tickContent();
-setInterval(tickContent, 20000);
 </script>
 </body>
 </html>
