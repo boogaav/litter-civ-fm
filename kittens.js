@@ -2,8 +2,8 @@
 // Edit here; the slider (index.html) and the kitten pages (kitten.html) both read it.
 // Launch cadence: one kitten token every Tuesday evening. Set `ca` when a token goes live.
 const KITTENS = [
-  { n: 1, name: "Chip",   sex: "♂", ticker: "CHIP",   pair: "NVDA", pairName: "NVIDIA",        launch: "2026-09-15", ca: null,
-    bio: "The AI kitten. Sleeps like a datacenter cools — constantly and expensively. Paired with the chip that runs the world." },
+  { n: 1, name: "Hopper", sex: "♂", ticker: "HOPPER", pair: "NVDA", pairName: "NVIDIA",        launch: "2026-09-15", ca: null,
+    bio: "Named after NVIDIA's Hopper architecture — and after what he does to his siblings' heads. The AI kitten. Sleeps like a datacenter cools: constantly and expensively." },
   { n: 2, name: "Melon",  sex: "♀", ticker: "MELON",  pair: "TSLA", pairName: "Tesla",         launch: "2026-09-22", ca: null,
     bio: "Elon → Melon. Ships on her own schedule, which is never the announced one. Full self-driving toward the food bowl." },
   { n: 3, name: "Rocket", sex: "♂", ticker: "ROCKET", pair: "SPCX", pairName: "SpaceX",        launch: "2026-09-29", ca: null,

@@ -189,8 +189,11 @@ document.addEventListener("visibilitychange", () => { if (visible()) pollHome();
 // Where the show is broadcasting. source: "youtube" (channel embed) | "x" (X live broadcast).
 // X's player can't be iframed, so X mode shows the pipeline's live frame (2s refresh) + a Watch-on-X
 // button; set `tweet` to the broadcast's tweet URL to use X's official embedded player instead.
-const LIVE = { source: "x", broadcast: "https://x.com/i/broadcasts/1AxRnZLDmDqxl", tweet: null };
-if (LIVE.source === "x") {
+const LIVE = { source: "twitch", channel: "vibewithmeai", broadcast: "https://www.twitch.tv/vibewithmeai", tweet: null };
+if (LIVE.source === "twitch") {
+  // Twitch's official player embeds; `parent` must list every domain that embeds it.
+  $("videobox").innerHTML = `<iframe src="https://player.twitch.tv/?channel=${LIVE.channel}&parent=litter.civ.fm&parent=boogaav.github.io&muted=true&autoplay=true" title="The Litter live stream" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+} else if (LIVE.source === "x") {
   const box = $("videobox");
   if (LIVE.tweet) {
     box.innerHTML = `<blockquote class="twitter-tweet" data-theme="dark" data-conversation="none"><a href="${LIVE.tweet}"></a></blockquote>`;
