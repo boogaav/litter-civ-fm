@@ -53,16 +53,31 @@
 </div>
 
 <script src="wallet.js"></script>
+<script src="kittens.js"></script>
 <script>
-const KITTENS = {
-  1: { name: null }, 2: { name: null }, 3: { name: null },
-  4: { name: null }, 5: { name: null }, 6: { name: null },
-};
 const n = Math.min(6, Math.max(1, Number(new URLSearchParams(location.search).get("n")) || 1));
-document.getElementById("num").textContent = "#" + n;
-document.title = "THE LITTER — kitten #" + n;
-if (KITTENS[n].name) document.getElementById("name").textContent = KITTENS[n].name;
+const K = KITTENS.find((k) => k.n === n);
+document.getElementById("num").textContent = K.name.toUpperCase() + " " + K.sex;
+document.title = "THE LITTER — " + K.name + " ($" + K.ticker + ")";
+document.getElementById("name").textContent = K.bio;
 document.getElementById("age").textContent = "Day " + (Math.floor((Date.now() - new Date("2026-08-31")) / 864e5) + 1);
+document.getElementById("status").textContent = "$" + K.ticker + " · paired with " + K.pair + " (" + K.pairName + ")";
+const launchRow = document.createElement("div");
+launchRow.className = "row";
+launchRow.innerHTML = `<span>token</span><b>${kittenLaunchLabel(K)}</b>`;
+document.getElementById("pstatus").parentElement.after(launchRow);
+if (K.ca) {
+  const caRow = document.createElement("div");
+  caRow.className = "row";
+  caRow.innerHTML = `<span>CA</span><b style="cursor:pointer" title="copy">${K.ca.slice(0, 8)}…${K.ca.slice(-6)} 📋</b>`;
+  caRow.querySelector("b").onclick = () => navigator.clipboard.writeText(K.ca);
+  launchRow.after(caRow);
+  const trade = document.createElement("a");
+  trade.className = "pledge"; trade.style.cssText = "display:block;text-align:center;text-decoration:none;margin-top:10px";
+  trade.target = "_blank"; trade.rel = "noopener";
+  trade.href = "https://www.ponsfamily.com/launchpad/" + K.ca; trade.textContent = "🐾 TRADE $" + K.ticker;
+  caRow.after(trade);
+}
 const API = "https://litter-api.boogaav.workers.dev";
 const btn = document.getElementById("pledge");
 const backersEl = document.getElementById("backers");
