@@ -10,38 +10,28 @@
 <meta property="og:image" content="https://litter.civ.fm/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📸</text></svg>">
+<link rel="stylesheet" href="theme.css">
 <style>
-  :root {
-    --bg: #0b0d12; --panel: #12151d; --edge: #1f2430; --text: #e8ebf2; --dim: #8891a5;
-    --accent: #ffb84d; --hot: #ff5c7a; --ok: #58d68d;
-  }
-  * { box-sizing: border-box; margin: 0; }
-  body { background: var(--bg); color: var(--text); font: 15px/1.5 ui-monospace, "SF Mono", Menlo, monospace; padding: 20px; }
-  .wrap { max-width: 1100px; margin: 0 auto; }
-  a { color: var(--dim); text-decoration: none; }
-  a:hover { color: var(--accent); }
-  h1 { font-size: 26px; letter-spacing: 3px; margin: 12px 0 4px; }
-  h1 span { color: var(--accent); }
-  .sub { color: var(--dim); margin-bottom: 20px; }
-  .sub b { color: var(--accent); }
+  .sub { color: var(--dim); font-family: var(--serif); font-size: 17px; margin: 4px 0 20px; }
+  .sub b { color: var(--text); font-weight: 600; }
+  .back { text-decoration: none; color: var(--dim); font-size: 13px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
-  .card { background: var(--panel); border: 1px solid var(--edge); border-radius: 10px; overflow: hidden; }
+  .card { background: var(--panel); border: 1px solid var(--edge); border-radius: 12px; overflow: hidden; }
   .card img { width: 100%; display: block; }
   .card .body { padding: 12px; }
-  .card .txt { font-size: 13px; color: var(--dim); max-height: 5.7em; overflow: hidden; }
-  .card time { font-size: 11px; color: var(--dim); }
+  .card .txt { font-size: 13px; color: var(--dim); max-height: 5.7em; overflow: hidden; font-family: var(--serif); }
+  .card time { font-size: 11px; color: var(--dim); font-family: var(--mono); }
   .card .actions { display: flex; gap: 8px; margin-top: 10px; }
-  .card .actions a { flex: 1; text-align: center; font-size: 12px; padding: 7px 4px; background: var(--bg); border: 1px solid var(--edge); border-radius: 6px; }
+  .card .actions a { flex: 1; text-align: center; font-size: 12px; padding: 7px 4px; border: 1px solid var(--edge); border-radius: 6px; text-decoration: none; color: var(--text); }
   .card .actions a:hover { border-color: var(--accent); color: var(--accent); }
   .empty { color: var(--dim); padding: 40px 0; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <a href="/">&larr; back to the litter</a>
-  <h1>THE <span>MOMENTS</span></h1>
-  <div class="sub">Every cute and chaotic moment, captured and captioned by the AI Watcher.
-  <b>Download, post, repeat.</b> The pâté must flow.</div>
+  <a class="back" href="/">&larr; The Litter Experiment</a>
+  <h1>Recorded <span>moments</span></h1>
+  <div class="sub">Every significant moment, captured and captioned by the AI observer. <b>Free to download and share.</b></div>
   <div class="grid" id="grid"><div class="empty">Loading moments…</div></div>
 </div>
 
@@ -64,8 +54,8 @@ const API = "https://litter-api.boogaav.workers.dev";
           <time>${new Date(p.at).toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"})}</time>
           <div class="txt">${p.text}</div>
           <div class="actions">
-            <a href="${img}" target="_blank" rel="noopener">⬇ full size</a>
-            <a href="${share}" target="_blank" rel="noopener">𝕏 post this</a>
+            <a href="${img}" target="_blank" rel="noopener">Full size</a>
+            <a href="${share}" target="_blank" rel="noopener">Share on X</a>
           </div>
         </div>
       </div>`;
