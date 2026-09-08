@@ -272,7 +272,7 @@ if (LIVE.source === "x") {
     const s = document.createElement("script"); s.src = "https://platform.twitter.com/widgets.js"; s.async = true; document.body.appendChild(s);
   } else {
     box.innerHTML = `<img id="liveFrame" alt="live frame" style="width:100%;height:100%;object-fit:cover">`;
-    setInterval(() => { $("liveFrame").src = API + "/frame.jpg?t=" + Date.now(); }, 2000);
+    setInterval(() => { $("liveFrame").src = API + "/frame.jpg?t=" + Date.now(); }, 3000);
     $("liveFrame").src = API + "/frame.jpg?t=" + Date.now();
   }
   $("xliveBtn").href = LIVE.broadcast;
@@ -310,7 +310,14 @@ async function tick() {
     }
     $("events").textContent = state.totals?.events ?? 0;
     $("motion").textContent = state.lastMotion ?? "–";
+  } catch {}
+}
+tick();
+setInterval(tick, 5000);
 
+// Thread + feed change slowly — poll them far less often than the live state.
+async function tickContent() {
+  try {
     const posts = await (await fetch(API + "/api/posts")).json();
     if (posts.length) {
       $("thread").innerHTML = posts.slice(0, 3).map(p => `
@@ -332,8 +339,8 @@ async function tick() {
     }
   } catch {}
 }
-tick();
-setInterval(tick, 3000);
+tickContent();
+setInterval(tickContent, 20000);
 </script>
 </body>
 </html>
