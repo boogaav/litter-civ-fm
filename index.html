@@ -138,7 +138,7 @@
 
     <div style="display:flex; flex-direction:column; gap:16px;">
       <div class="panel" id="market" style="display:none;">
-        <h2>$LITTER <span class="q r" tabindex="0" data-tip="Live data from the pons launchpad. Bonding curve now; graduates to a locked Uniswap v4 pool at 4.2 ETH. 'Cans' = trading fees earned so far, converted to cans of pâté at $2.50. The fees really do buy the food.">?</span></h2>
+        <h2><img src="k/mama.jpg" alt="" style="width:26px;height:26px;border-radius:50%;object-fit:cover;margin-right:8px">Mama · $LITTER <span class="q r" tabindex="0" data-tip="Live data from the pons launchpad. Bonding curve now; graduates to a locked Uniswap v4 pool at 4.2 ETH. 'Cans' = trading fees earned so far, converted to cans of pâté at $2.50. The fees really do buy the food.">?</span></h2>
         <div class="mrow"><span>price</span><b id="mPrice">–</b></div>
         <div class="mrow"><span>market cap</span><b id="mMcap">–</b></div>
         <div class="mrow"><span>holders</span><b id="mHolders">–</b></div>
@@ -261,7 +261,7 @@ let litterMarket = null;
 const MILESTONES = [100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000];
 function renderRace() {
   const runners = KITTENS.map(k => ({ k, usd: kittenMarket[k.n]?.feesUsd ?? 0, vol: kittenMarket[k.n]?.volume24hUsd, live: !!k.ca }));
-  const mama = litterMarket ? { k: { n: 0, name: "Mama", ticker: "LITTER" }, usd: litterMarket.feesUsd, vol: litterMarket.volume24hUsd, live: true, pace: true } : null;
+  const mama = { k: { n: 0, name: "Mama", ticker: "LITTER" }, usd: litterMarket?.feesUsd ?? 0, vol: litterMarket?.volume24hUsd, live: !!litterMarket, pace: true };
   const all = mama ? [mama, ...runners] : runners;
   const leader = Math.max(0, ...runners.map(r => r.usd));
   const ref = Math.max(leader, mama?.usd ?? 0);
@@ -274,11 +274,12 @@ function renderRace() {
     lanes.map((r, i) => {
       const x = pct(r.usd);
       const tip = r.live ? `$${r.usd.toFixed(0)} earned for food${r.vol != null ? " · $" + r.vol.toFixed(0) + " volume 24h" : ""}` : "at the gate — token not live yet";
-      const img = r.pace ? `<span style="font:600 13px var(--serif);color:var(--accent)">M</span>` : `<img src="k/${r.k.n}.jpg" alt="">`;
+      const src = r.pace ? "k/mama.jpg" : `k/${r.k.n}.jpg`;
+      const img = `<img src="${src}" alt="">`;
       return `<div class="lane ${r.pace ? "pace" : ""} ${!r.pace && i === (mama ? 1 : 0) && r.usd > 0 ? "leader" : ""}">
-        <div class="who">${r.pace ? "" : `<img src="k/${r.k.n}.jpg" alt="">`}${r.k.name} <span>$${r.k.ticker}${r.pace ? " · pace" : ""}</span></div>
+        <div class="who"><img src="${src}" alt="">${r.k.name} <span>$${r.k.ticker}${r.pace ? " · pace" : ""}</span></div>
         <div class="track" style="--x:${x}%">
-          <div class="runner" tabindex="0" data-tip="${tip}" style="left:${x}%" ${r.pace ? "" : `onclick="location.href='kitten.html?n=${r.k.n}'"`}>${img}</div>
+          <div class="runner" tabindex="0" data-tip="${r.pace && !r.live ? "Mama · $LITTER · market data loading" : tip}" style="left:${x}%" ${r.pace ? `onclick="window.open('https://www.ponsfamily.com/launchpad/0xAa2A90777994A29d659f1DEEB2E21Ae7de312b3A')"` : `onclick="location.href='kitten.html?n=${r.k.n}'"`}>${img}</div>
           <div class="amt">${r.live ? "$" + r.usd.toFixed(0) : "—"}</div>
         </div>
       </div>`;
