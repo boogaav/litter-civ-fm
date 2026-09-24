@@ -28,10 +28,20 @@
     <div class="row"><span>born</span><b>Aug 31, 2026</b></div>
     <div class="row"><span>age</span><b id="age">Day ?</b></div>
     <div class="row"><span>token</span><b id="status"></b></div>
-    <div class="row"><span>portrait</span><b id="pstatus">pending — still part of the pile</b></div>
-    <div class="note">Portraits are captured by the AI observer once a kitten separates from the pile. Back a kitten to join its faction; backers rank the subjects on the home page.</div>
+    <div class="row"><span>portrait</span><b id="pstatus">pending</b></div>
+    <div class="note">Back a kitten to join its faction; backers rank the subjects on the home page.</div>
     <button class="pledge" id="pledge">Back this kitten</button>
     <div class="backers" id="backers"></div>
+  </div>
+
+  <div class="panel" style="margin-top:16px;">
+    <h2 id="tHead">Token</h2>
+    <div class="row"><span>ticker</span><b id="tTicker"></b></div>
+    <div class="row"><span>paired with</span><b id="tPair"></b></div>
+    <div class="row"><span>launch</span><b id="tLaunch"></b></div>
+    <div id="tMarket"></div>
+    <div id="tAction"></div>
+    <div class="note" id="tNote"></div>
   </div>
 </div>
 
@@ -46,23 +56,37 @@ document.title = "The Litter Experiment — " + K.name + " ($" + K.ticker + ")";
 document.getElementById("name").textContent = K.bio;
 document.getElementById("age").textContent = "Day " + (Math.floor((Date.now() - new Date("2026-08-31")) / 864e5) + 1);
 document.getElementById("status").textContent = "$" + K.ticker + " · paired with " + K.pair + " (" + K.pairName + ")";
-const launchRow = document.createElement("div");
-launchRow.className = "row";
-launchRow.innerHTML = `<span>token</span><b>${kittenLaunchLabel(K)}</b>`;
-document.getElementById("pstatus").parentElement.after(launchRow);
-if (K.ca) {
-  const caRow = document.createElement("div");
-  caRow.className = "row";
-  caRow.innerHTML = `<span>CA</span><b style="cursor:pointer" title="copy">${K.ca.slice(0, 8)}…${K.ca.slice(-6)} 📋</b>`;
-  caRow.querySelector("b").onclick = () => navigator.clipboard.writeText(K.ca);
-  launchRow.after(caRow);
-  const trade = document.createElement("a");
-  trade.className = "pledge"; trade.style.cssText = "display:block;text-align:center;text-decoration:none;margin-top:10px";
-  trade.target = "_blank"; trade.rel = "noopener";
-  trade.href = "https://www.ponsfamily.com/launchpad/" + K.ca; trade.textContent = "Trade $" + K.ticker;
-  caRow.after(trade);
-}
 const API = "https://litter-api.boogaav.workers.dev";
+// --- Token trading panel ---
+{
+  const st = kittenStatus(K);
+  const d = new Date(K.launch + "T18:00:00Z");
+  document.getElementById("tHead").textContent = "$" + K.ticker + " · " + (st === "live" ? "trading" : st === "tonight" ? "launching tonight" : "upcoming");
+  document.getElementById("tTicker").textContent = "$" + K.ticker;
+  document.getElementById("tPair").textContent = K.pair + " · " + K.pairName;
+  document.getElementById("tLaunch").textContent = kittenLaunchLabel(K);
+  const act = document.getElementById("tAction"), note = document.getElementById("tNote");
+  if (K.ca) {
+    const short = K.ca.slice(0, 8) + "…" + K.ca.slice(-6);
+    act.innerHTML = `<div class="row"><span>contract</span><b id="tCa" style="cursor:pointer" title="copy">${short} · copy</b></div>
+      <a class="pledge" target="_blank" rel="noopener" href="https://www.ponsfamily.com/launchpad/${K.ca}">Trade $${K.ticker}</a>`;
+    document.getElementById("tCa").onclick = () => { navigator.clipboard.writeText(K.ca); document.getElementById("tCa").textContent = "copied"; setTimeout(() => document.getElementById("tCa").textContent = short + " · copy", 1500); };
+    note.textContent = "Only this contract address is real. Bonding curve on pons (Robinhood Chain); graduates to Uniswap at 4.2 ETH. Trading fees buy the litter's food. Memecoin, not an investment — it can go to zero.";
+    const fmt = (v) => v >= 1e6 ? "$" + (v/1e6).toFixed(2) + "M" : v >= 1e3 ? "$" + (v/1e3).toFixed(1) + "k" : "$" + v.toFixed(v < 0.01 ? 7 : 2);
+    fetch(API + "/api/market?token=" + K.ca).then((r) => r.json()).then((m) => {
+      if (m.error) return;
+      document.getElementById("tMarket").innerHTML =
+        `<div class="row"><span>price</span><b>${fmt(m.priceUsd)}</b></div>
+         <div class="row"><span>market cap</span><b>${fmt(m.mcapUsd)}</b></div>
+         <div class="row"><span>holders</span><b>${m.holders}</b></div>
+         <div class="row"><span>food funded</span><b>${m.cans} cans</b></div>`;
+    }).catch(() => {});
+  } else {
+    act.innerHTML = `<button class="pledge" disabled>${st === "tonight" ? "Launches tonight" : "Launches " + d.toLocaleDateString([], { weekday: "long", month: "short", day: "numeric" })}</button>`;
+    note.textContent = "One kitten token launches every Tuesday evening on pons (Robinhood Chain), paired with a tokenized stock. The contract address appears here the moment $" + K.ticker + " is live — anything claiming to be $" + K.ticker + " before that is a fake.";
+  }
+}
+
 const btn = document.getElementById("pledge");
 const backersEl = document.getElementById("backers");
 
@@ -118,7 +142,7 @@ img.onload = () => {
   const p = document.getElementById("portrait");
   p.innerHTML = "";
   p.appendChild(img);
-  document.getElementById("pstatus").textContent = "captured by the Watcher";
+  document.getElementById("pstatus").textContent = "studio session · Sep 2026";
 };
 img.src = "k/" + n + ".jpg";
 </script>
