@@ -39,6 +39,44 @@
   .subj .m span { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
   .subj .foot { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--dim); }
   .subj .foot b { color: var(--ok); font-weight: 600; }
+
+  /* view toggle */
+  .viewtoggle { margin-left: auto; display: inline-flex; border: 1px solid var(--edge); border-radius: 99px; overflow: hidden; }
+  .viewtoggle button { font: 500 11px var(--sans); letter-spacing: .06em; text-transform: uppercase; padding: 4px 10px; border: 0; background: var(--panel); color: var(--dim); cursor: pointer; }
+  .viewtoggle button.on { background: var(--text); color: #fff; }
+  /* list view */
+  .subjects.list { display: block; }
+  .subjects.list .lrow { display: grid; grid-template-columns: 44px 1.4fr 1fr 1fr 1fr 1fr .8fr; gap: 10px; align-items: center; padding: 8px 6px; border-top: 1px solid var(--edge); cursor: pointer; font-size: 13px; }
+  .subjects.list .lrow:hover { background: var(--bg); }
+  .subjects.list .lrow.head { border-top: 0; cursor: default; font: 600 10px var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+  .subjects.list .lrow.head:hover { background: none; }
+  .subjects.list .thumb { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; display: block; background: var(--accent-soft); }
+  .subjects.list .nm { font-family: var(--serif); font-weight: 600; font-size: 15px; } .subjects.list .nm span { color: var(--dim); font-weight: 400; font-size: 12px; }
+  .subjects.list .num { font-family: var(--mono); font-size: 12px; }
+  .subjects.list .tk { font: 500 12px var(--mono); color: var(--accent); }
+  .subjects.list .lt { font-size: 11px; color: var(--dim); text-align: right; } .subjects.list .lt.live { color: var(--ok); font-weight: 600; }
+  @media (max-width: 640px) { .subjects.list .lrow { grid-template-columns: 40px 1.4fr 1fr 1fr; } .subjects.list .hide-m { display: none; } }
+  /* race */
+  .racestat { margin-left: auto; font: 500 11px var(--mono); color: var(--dim); text-transform: none; letter-spacing: 0; }
+  .race { position: relative; padding-top: 22px; }
+  .race .ticks { position: absolute; top: 0; left: 150px; right: 34px; height: 100%; pointer-events: none; }
+  .race .tick { position: absolute; top: 0; bottom: 0; border-left: 1px dashed var(--edge); }
+  .race .tick i { position: absolute; top: -20px; left: 4px; font: 500 10px var(--mono); color: var(--dim); white-space: nowrap; }
+  .race .tick.finish { border-left: 2px solid var(--text); }
+  .race .tick.finish i { color: var(--text); font-weight: 600; }
+  .lane { display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 0; height: 48px; border-top: 1px solid var(--edge); }
+  .lane:first-of-type { border-top: 0; }
+  .lane .who { display: flex; align-items: center; gap: 8px; font-family: var(--serif); font-weight: 600; font-size: 14px; }
+  .lane .who span { color: var(--dim); font: 400 11px var(--mono); }
+  .lane .who img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+  .lane .track { position: relative; height: 100%; margin-right: 34px; }
+  .lane .runner { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 34px; height: 34px; border-radius: 50%; overflow: hidden; border: 2px solid var(--panel); box-shadow: 0 2px 8px rgba(0,0,0,.18); transition: left 1.2s cubic-bezier(.2,.8,.2,1); cursor: pointer; background: var(--accent-soft); display: grid; place-items: center; font: 600 13px var(--serif); color: var(--accent); }
+  .lane .runner img { width: 100%; height: 100%; object-fit: cover; }
+  .lane .runner:hover::after, .lane .runner:focus::after { content: attr(data-tip); position: absolute; left: 40px; top: 50%; transform: translateY(-50%); white-space: nowrap; background: var(--text); color: #fff; font: 400 11px var(--sans); padding: 5px 8px; border-radius: 6px; z-index: 5; }
+  .lane .runner:hover { z-index: 6; overflow: visible; }
+  .lane .amt { position: absolute; top: 50%; transform: translateY(-50%); left: calc(var(--x) + 22px); font: 600 11px var(--mono); color: var(--text); white-space: nowrap; transition: left 1.2s cubic-bezier(.2,.8,.2,1); }
+  .lane.pace { opacity: .75; } .lane.pace .who { font-style: italic; }
+  .lane.leader .amt { color: var(--ok); }
 </style>
 </head>
 <body>
@@ -86,8 +124,15 @@
       </div>
 
       <div class="panel" style="margin-top:16px;">
-        <h2>The subjects <span class="q" tabindex="0" data-tip="Six kittens, six stocks. Connect a wallet and back a kitten — rankings count backers. Each kitten gets its own token, paired with a tokenized stock, launching one per Tuesday evening. Market cap, 24h volume and food earnings appear once a kitten's token is live. Click a card to meet the kitten.">?</span></h2>
+        <h2>The subjects <span class="q" tabindex="0" data-tip="Six kittens, six stocks. Connect a wallet and back a kitten — rankings count backers. Each kitten gets its own token, paired with a tokenized stock, launching one per Tuesday evening. Market cap, 24h volume and food earnings appear once a kitten's token is live. Click a card to meet the kitten.">?</span>
+          <span class="viewtoggle" id="viewToggle"><button data-v="cards" class="on">Cards</button><button data-v="list">List</button></span></h2>
         <div class="subjects" id="lb"></div>
+      </div>
+
+      <div class="panel" style="margin-top:16px;">
+        <h2>The race <span class="q" tabindex="0" data-tip="Each kitten's token pays a trading fee, and that fee buys the litter's food. This track shows how much each kitten has earned so far. Mama ($LITTER) runs the pace lane. Milestones are real: at each one the litter gets something on camera.">?</span>
+          <span class="racestat" id="raceStat"></span></h2>
+        <div class="race" id="race"></div>
       </div>
 
       <div class="panel" style="margin-top:16px;">
@@ -156,7 +201,7 @@ $("ca").onclick = () => {
 let pledgeCounts = {};
 const kittenMarket = {};
 const fmtM = (v) => v == null ? "—" : v >= 1e6 ? "$" + (v/1e6).toFixed(2) + "M" : v >= 1e3 ? "$" + (v/1e3).toFixed(1) + "k" : "$" + v.toFixed(0);
-function renderLeaderboard() {
+function renderCards() {
   const rows = [...KITTENS].sort((a, b) => (pledgeCounts[b.n] ?? 0) - (pledgeCounts[a.n] ?? 0) || a.launch.localeCompare(b.launch));
   $("lb").innerHTML = rows.map((k, i) => {
     const s = kittenStatus(k), m = kittenMarket[k.n];
@@ -178,19 +223,83 @@ function renderLeaderboard() {
     </div>`;
   }).join("");
 }
+let subjView = "cards";
+try { subjView = localStorage.getItem("subjView") || "cards"; } catch {}
+function setView(v) {
+  subjView = v; try { localStorage.setItem("subjView", v); } catch {}
+  [...$("viewToggle").children].forEach(b => b.classList.toggle("on", b.dataset.v === v));
+  $("lb").classList.toggle("list", v === "list");
+  renderLeaderboard();
+}
+$("viewToggle").onclick = (e) => { const b = e.target.closest("button[data-v]"); if (b) setView(b.dataset.v); };
+function renderLeaderboard() {
+  if (subjView === "list") return renderList();
+  return renderCards();
+}
+function renderList() {
+  const rows = [...KITTENS].sort((a, b) => (pledgeCounts[b.n] ?? 0) - (pledgeCounts[a.n] ?? 0) || a.launch.localeCompare(b.launch));
+  $("lb").innerHTML = `<div class="lrow head"><span></span><span>Kitten</span><span>Token · pair</span><span class="hide-m">Market cap</span><span class="hide-m">Vol 24h</span><span>Earned</span><span class="hide-m" style="text-align:right">Launch</span></div>` +
+    rows.map((k) => {
+      const s = kittenStatus(k), m = kittenMarket[k.n];
+      const d = new Date(k.launch + "T18:00:00Z"), days = Math.ceil((d - Date.now()) / 864e5);
+      const lt = s === "live" ? "trading" : s === "tonight" ? "tonight" : s === "pending" ? "pending" : d.toLocaleDateString([], { month: "short", day: "numeric" }) + " · " + days + "d";
+      return `<div class="lrow" onclick="location.href='kitten.html?n=${k.n}'">
+        <img class="thumb" src="k/${k.n}.jpg" alt="" loading="lazy">
+        <span class="nm">${k.name} <span>${k.sex} · ${pledgeCounts[k.n] ?? 0} backers</span></span>
+        <span class="tk">$${k.ticker} · ${k.pair}</span>
+        <span class="num hide-m">${fmtM(m?.mcapUsd)}</span>
+        <span class="num hide-m">${fmtM(m?.volume24hUsd)}</span>
+        <span class="num">${fmtM(m?.feesUsd)}</span>
+        <span class="lt hide-m ${s}">${lt}</span>
+      </div>`;
+    }).join("");
+}
+
+// --- The race: earnings for food ---
+let litterMarket = null;
+const MILESTONES = [100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000];
+function renderRace() {
+  const runners = KITTENS.map(k => ({ k, usd: kittenMarket[k.n]?.feesUsd ?? 0, vol: kittenMarket[k.n]?.volume24hUsd, live: !!k.ca }));
+  const mama = litterMarket ? { k: { n: 0, name: "Mama", ticker: "LITTER" }, usd: litterMarket.feesUsd, vol: litterMarket.volume24hUsd, live: true, pace: true } : null;
+  const all = mama ? [mama, ...runners] : runners;
+  const leader = Math.max(0, ...runners.map(r => r.usd));
+  const ref = Math.max(leader, mama?.usd ?? 0);
+  const finish = MILESTONES.find(m => m > ref * 1.15) ?? MILESTONES[MILESTONES.length - 1];
+  const ticks = MILESTONES.filter(m => m < finish);
+  const pct = (usd) => Math.min(100, (usd / finish) * 100);
+  const sorted = [...runners].sort((a, b) => b.usd - a.usd);
+  const lanes = mama ? [mama, ...sorted] : sorted;
+  $("race").innerHTML = `<div class="ticks">${ticks.map(m => `<div class="tick" style="left:${pct(m)}%"><i>$${m.toLocaleString()}</i></div>`).join("")}<div class="tick finish" style="left:100%"><i>finish $${finish.toLocaleString()}</i></div></div>` +
+    lanes.map((r, i) => {
+      const x = pct(r.usd);
+      const tip = r.live ? `$${r.usd.toFixed(0)} earned for food${r.vol != null ? " · $" + r.vol.toFixed(0) + " volume 24h" : ""}` : "at the gate — token not live yet";
+      const img = r.pace ? `<span style="font:600 13px var(--serif);color:var(--accent)">M</span>` : `<img src="k/${r.k.n}.jpg" alt="">`;
+      return `<div class="lane ${r.pace ? "pace" : ""} ${!r.pace && i === (mama ? 1 : 0) && r.usd > 0 ? "leader" : ""}">
+        <div class="who">${r.pace ? "" : `<img src="k/${r.k.n}.jpg" alt="">`}${r.k.name} <span>$${r.k.ticker}${r.pace ? " · pace" : ""}</span></div>
+        <div class="track" style="--x:${x}%">
+          <div class="runner" tabindex="0" data-tip="${tip}" style="left:${x}%" ${r.pace ? "" : `onclick="location.href='kitten.html?n=${r.k.n}'"`}>${img}</div>
+          <div class="amt">${r.live ? "$" + r.usd.toFixed(0) : "—"}</div>
+        </div>
+      </div>`;
+    }).join("");
+  const total = runners.reduce((s, r) => s + r.usd, 0);
+  $("raceStat").textContent = runners.some(r => r.live) ? `$${total.toFixed(0)} earned by the six · next milestone $${finish.toLocaleString()}` : "gates open at the first Tuesday launch";
+}
 async function loadKittenMarkets() {
   await Promise.all(KITTENS.filter(k => k.ca).map(async (k) => {
     try { const m = await (await fetch(API + "/api/market?token=" + k.ca)).json(); if (!m.error) kittenMarket[k.n] = m; } catch {}
   }));
-  renderLeaderboard();
+  renderLeaderboard(); renderRace();
 }
 loadKittenMarkets();
 setInterval(loadKittenMarkets, 60000);
+setView(subjView); renderRace();
 renderLeaderboard();
 
 const fmtUsd = (v) => v >= 1e6 ? "$" + (v/1e6).toFixed(2) + "M" : v >= 1e3 ? "$" + (v/1e3).toFixed(1) + "k" : "$" + v.toFixed(v < 0.01 ? 7 : 2);
 function renderMarket(m) {
   if (!m || m.error) return;
+  litterMarket = m; renderRace();
   $("market").style.display = "";
   $("mPrice").textContent = fmtUsd(m.priceUsd);
   $("mMcap").textContent = fmtUsd(m.mcapUsd);
