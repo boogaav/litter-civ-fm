@@ -82,7 +82,7 @@ const API = "https://litter-api.boogaav.workers.dev";
          <div class="row"><span>food funded</span><b>${m.cans} cans</b></div>`;
     }).catch(() => {});
   } else {
-    act.innerHTML = `<button class="pledge" disabled>${st === "tonight" ? "Launches tonight" : "Launches " + d.toLocaleDateString([], { weekday: "long", month: "short", day: "numeric" })}</button>`;
+    act.innerHTML = `<button class="pledge" disabled>${st === "tonight" ? "Launches tonight" : st === "pending" ? "Launch pending" : "Launches " + d.toLocaleDateString([], { weekday: "long", month: "short", day: "numeric" })}</button>`;
     note.textContent = "One kitten token launches every Tuesday evening on pons (Robinhood Chain), paired with a tokenized stock. The contract address appears here the moment $" + K.ticker + " is live — anything claiming to be $" + K.ticker + " before that is a fake.";
   }
 }

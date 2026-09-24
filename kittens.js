@@ -29,6 +29,7 @@ function kittenLaunchLabel(k) {
   const s = kittenStatus(k);
   if (s === "live") return "LIVE — trade now";
   if (s === "tonight") return "LAUNCHES TONIGHT";
+  if (s === "pending") return "launch pending — CA soon";
   const d = new Date(k.launch + "T18:00:00Z");
   const days = Math.ceil((d - Date.now()) / 864e5);
   return `launches ${d.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })} · in ${days}d`;
