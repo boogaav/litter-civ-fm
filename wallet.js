@@ -55,9 +55,9 @@ function mountWalletButton(onChange) {
       box.innerHTML = `<span class="badge liveai" style="cursor:pointer" title="click to disconnect">${s.chain === "sol" ? "◎" : "Ξ"} ${shortAddr(s.address)}</span>`;
       box.firstChild.onclick = () => { litterDisconnect(); render(); onChange?.(null); };
     } else {
-      box.innerHTML = `<span class="badge" style="cursor:pointer">connect ◎ SOL</span> <span class="badge" style="cursor:pointer">connect Ξ ETH</span>`;
-      const [sol, eth] = box.querySelectorAll("span");
-      sol.onclick = async () => { try { const r = await litterConnect("sol"); if (r) { render(); onChange?.(r); } } catch (e) { alert(e.message); } };
+      // SOL connect hidden for now (the Family lives on Robinhood Chain); litterConnect("sol") still works if re-enabled.
+      box.innerHTML = `<span class="badge" style="cursor:pointer">connect Ξ ETH</span>`;
+      const [eth] = box.querySelectorAll("span");
       eth.onclick = async () => { try { const r = await litterConnect("eth"); if (r) { render(); onChange?.(r); } } catch (e) { alert(e.message); } };
     }
   };
