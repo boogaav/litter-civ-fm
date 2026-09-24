@@ -17,6 +17,28 @@
 <link rel="stylesheet" href="theme.css">
 <style>
   .marquee { display: none; }
+
+  /* subjects — big-photo cards */
+  .subjects { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (max-width: 640px) { .subjects { grid-template-columns: 1fr; } }
+  .subj { position: relative; background: var(--bg); border: 1px solid var(--edge); border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform .15s, box-shadow .15s; }
+  .subj:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,.08); }
+  .subj .photo { aspect-ratio: 4/5; background: var(--accent-soft); display: grid; place-items: center; overflow: hidden; color: var(--accent); font: 600 56px var(--serif); }
+  .subj .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .subj .rank { position: absolute; top: 10px; left: 10px; background: rgba(22,24,29,.85); color: #fff; font: 600 11px var(--mono); padding: 3px 8px; border-radius: 99px; letter-spacing: .08em; }
+  .subj .launchtag { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,.92); color: var(--text); font: 600 10px var(--sans); letter-spacing: .1em; text-transform: uppercase; padding: 4px 8px; border-radius: 99px; }
+  .subj .launchtag.live { background: var(--ok); color: #fff; } .subj .launchtag.tonight { background: var(--hot); color: #fff; }
+  .subj .body { padding: 12px 14px 14px; }
+  .subj h3 { font-family: var(--serif); font-size: 20px; font-weight: 600; display: flex; align-items: baseline; gap: 8px; }
+  .subj h3 .sex { color: var(--dim); font-size: 14px; font-weight: 400; }
+  .subj h3 .tok { margin-left: auto; font: 500 12px var(--mono); color: var(--accent); }
+  .subj .bio { font-family: var(--serif); font-size: 14px; line-height: 1.45; color: var(--dim); margin: 6px 0 10px; }
+  .subj .m { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .subj .m div { background: var(--panel); border: 1px solid var(--edge); border-radius: 8px; padding: 6px 8px; }
+  .subj .m b { display: block; font: 600 14px var(--mono); }
+  .subj .m span { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+  .subj .foot { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--dim); }
+  .subj .foot b { color: var(--ok); font-weight: 600; }
 </style>
 </head>
 <body>
@@ -64,11 +86,8 @@
       </div>
 
       <div class="panel" style="margin-top:16px;">
-        <h2>The subjects <span class="q" tabindex="0" data-tip="Six kittens, six stocks. Connect a wallet and back a kitten — rankings count backers. Each kitten gets its own token, paired with a tokenized stock, launching one per Tuesday evening. Click a row to meet the kitten.">?</span></h2>
-        <table class="lb">
-          <thead><tr><th></th><th></th><th>Kitten</th><th>Token · pair</th><th style="text-align:right">Backers</th><th style="text-align:right">Launch</th></tr></thead>
-          <tbody id="lb"></tbody>
-        </table>
+        <h2>The subjects <span class="q" tabindex="0" data-tip="Six kittens, six stocks. Connect a wallet and back a kitten — rankings count backers. Each kitten gets its own token, paired with a tokenized stock, launching one per Tuesday evening. Market cap, 24h volume and food earnings appear once a kitten's token is live. Click a card to meet the kitten.">?</span></h2>
+        <div class="subjects" id="lb"></div>
       </div>
 
       <div class="panel" style="margin-top:16px;">
@@ -135,22 +154,38 @@ $("ca").onclick = () => {
 
 // --- Leaderboard ---
 let pledgeCounts = {};
+const kittenMarket = {};
+const fmtM = (v) => v == null ? "—" : v >= 1e6 ? "$" + (v/1e6).toFixed(2) + "M" : v >= 1e3 ? "$" + (v/1e3).toFixed(1) + "k" : "$" + v.toFixed(0);
 function renderLeaderboard() {
   const rows = [...KITTENS].sort((a, b) => (pledgeCounts[b.n] ?? 0) - (pledgeCounts[a.n] ?? 0) || a.launch.localeCompare(b.launch));
   $("lb").innerHTML = rows.map((k, i) => {
-    const s = kittenStatus(k);
+    const s = kittenStatus(k), m = kittenMarket[k.n];
     const d = new Date(k.launch + "T18:00:00Z"), days = Math.ceil((d - Date.now()) / 864e5);
-    const launch = s === "live" ? "LIVE ↗" : s === "tonight" ? "TONIGHT" : `<b>${d.toLocaleDateString([], { month: "short", day: "numeric" })}</b> · ${days}d`;
-    return `<tr class="row" onclick="location.href='kitten.html?n=${k.n}'">
-      <td class="rank">${i + 1}</td>
-      <td><div class="por"><img src="k/${k.n}.jpg" alt="" onerror="this.replaceWith(document.createTextNode('${k.name[0]}'))"></div></td>
-      <td class="name"><b>${k.name}</b> <span>${k.sex}</span></td>
-      <td class="tok">$${k.ticker} <span class="hide-m">· ${k.pair}</span></td>
-      <td class="backers">${pledgeCounts[k.n] ?? 0}</td>
-      <td class="launch ${s}">${launch}</td>
-    </tr>`;
+    const tag = s === "live" ? "trading" : s === "tonight" ? "tonight" : s === "pending" ? "launch pending" : d.toLocaleDateString([], { month: "short", day: "numeric" }) + " · " + days + "d";
+    return `<div class="subj" onclick="location.href='kitten.html?n=${k.n}'">
+      <div class="photo"><img src="k/${k.n}.jpg" alt="${k.name}" loading="lazy" onerror="this.replaceWith(document.createTextNode('${k.name[0]}'))"></div>
+      <span class="rank">#${i + 1}</span><span class="launchtag ${s}">${tag}</span>
+      <div class="body">
+        <h3>${k.name} <span class="sex">${k.sex}</span><span class="tok">$${k.ticker} · ${k.pair}</span></h3>
+        <div class="bio">${k.bio}</div>
+        <div class="m">
+          <div><b>${fmtM(m?.mcapUsd)}</b><span>market cap</span></div>
+          <div><b>${fmtM(m?.volume24hUsd)}</b><span>volume 24h</span></div>
+          <div><b>${fmtM(m?.feesUsd)}</b><span>earned for food</span></div>
+        </div>
+        <div class="foot"><span><b>${pledgeCounts[k.n] ?? 0}</b> backers</span><span>${m ? m.holders + " holders" : "token not live yet"}</span></div>
+      </div>
+    </div>`;
   }).join("");
 }
+async function loadKittenMarkets() {
+  await Promise.all(KITTENS.filter(k => k.ca).map(async (k) => {
+    try { const m = await (await fetch(API + "/api/market?token=" + k.ca)).json(); if (!m.error) kittenMarket[k.n] = m; } catch {}
+  }));
+  renderLeaderboard();
+}
+loadKittenMarkets();
+setInterval(loadKittenMarkets, 60000);
 renderLeaderboard();
 
 const fmtUsd = (v) => v >= 1e6 ? "$" + (v/1e6).toFixed(2) + "M" : v >= 1e3 ? "$" + (v/1e3).toFixed(1) + "k" : "$" + v.toFixed(v < 0.01 ? 7 : 2);
