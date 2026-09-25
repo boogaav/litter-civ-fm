@@ -2,7 +2,7 @@
 // Buy: swap([{kind:21, tokenIn: WETH, tokenOut: TOKEN, pool: curve, 0,0,0,"0x",0x0,0x0}], 0x0, amountIn, minOut, deadline) with msg.value = amountIn.
 // Sell: approve(router, amount) then the same swap with tokenIn/tokenOut flipped, value 0.
 // Every trade is confirmed by the user in their wallet; this code only prepares the transaction.
-const ROUTER_ABI = ["function swap((uint8,address,address,address,uint24,int24,address,bytes,address,bytes32)[] path, address recipient, uint256 amountIn, uint256 minOut, uint256 deadline) payable returns (uint256)"];
+const ROUTER_ABI = ["function swap((uint8,address,address,address,uint24,int24,address,bytes,address,bytes32)[] path, address recipient, uint256 amountIn, uint256 minOut, uint256 deadline) payable"];
 const ERC20_ABI = ["function balanceOf(address) view returns (uint256)", "function allowance(address,address) view returns (uint256)", "function approve(address,uint256) returns (bool)", "function decimals() view returns (uint8)"];
 
 async function ensureChain(eth) {
@@ -18,21 +18,21 @@ function pathFor(token, side) {
   const [tIn, tOut] = side === "buy" ? [CHAIN.weth, token.ca] : [token.ca, CHAIN.weth];
   return [[CHAIN.curveKind, tIn, tOut, token.curve, 0, 0, ethers.ZeroAddress, "0x", ethers.ZeroAddress, ethers.ZeroHash]];
 }
-// Quote by simulating the swap with minOut = 0 (exact curve output, no ABI guesswork).
-async function quote(provider, from, token, side, amountIn) {
-  const router = new ethers.Contract(CHAIN.router, ROUTER_ABI, provider);
-  const deadline = Math.floor(Date.now() / 1000) + 600;
-  const out = await router.swap.staticCall(pathFor(token, side), ethers.ZeroAddress, amountIn, 0n, deadline, { from, value: side === "buy" ? amountIn : 0n });
-  return out;
+// Quote from the live curve price (the router's swap() returns no value, so it can't be read via eth_call).
+// Bonding curves move with size — keep trades small or raise slippage.
+function quoteFromMarket(market, side, amountIn) {
+  if (!market || !market.priceUsd || !market.ethUsd) throw new Error("no live price yet");
+  const priceEth = market.priceUsd / market.ethUsd; // ETH per token
+  if (side === "buy") return ethers.parseUnits((Number(ethers.formatEther(amountIn)) / priceEth).toFixed(0), 18);
+  return ethers.parseEther((Number(ethers.formatUnits(amountIn, 18)) * priceEth).toFixed(18));
 }
-async function executeTrade({ token, side, amountIn, slippageBps, onStatus }) {
+async function executeTrade({ token, side, amountIn, slippageBps, market, onStatus }) {
   const eth = window.ethereum; if (!eth) throw new Error("No ETH wallet found");
   await ensureChain(eth);
   const provider = new ethers.BrowserProvider(eth);
   const signer = await provider.getSigner();
   const from = await signer.getAddress();
-  onStatus("Quoting on the curve…");
-  const expected = await quote(provider, from, token, side, amountIn);
+  const expected = quoteFromMarket(market, side, amountIn);
   const minOut = expected - (expected * BigInt(slippageBps)) / 10000n;
   const deadline = Math.floor(Date.now() / 1000) + 600;
   if (side === "sell") {

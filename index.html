@@ -78,6 +78,8 @@
   .lane.pace { opacity: .75; } .lane.pace .who { font-style: italic; }
   .lane.leader .amt { color: var(--ok); }
   @media (max-width: 640px) { .lane { grid-template-columns: 120px 1fr; } .race .ticks { left: 120px; } .lane .who span { display: none; } }
+  .hero-race { margin: 0 0 18px; }
+  .hero-race h2 { font-size: 13px; }
 </style>
 </head>
 <body>
@@ -93,6 +95,12 @@
   <div class="tagline">Can an AI raise six kittens? A 50-day open experiment, observed live — every frame judged, every moment recorded, food paid for by the market.</div>
 
   <div class="band"><span>Status <b>live</b></span><span>Day <b id="bandDay">—</b> of 50</span><span>Subjects <b>6 kittens · 1 mother</b></span><span>Observer <b>AI, 24/7</b></span><span>Next launch <b id="bandNext">—</b></span></div>
+
+  <div class="panel hero-race" id="racePanel">
+        <h2>The race <span class="q" tabindex="0" data-tip="Each kitten's token pays a trading fee, and that fee buys the litter's food. This track shows how much each kitten has earned so far. Mama ($LITTER) runs the pace lane. Milestones are real: at each one the litter gets something on camera.">?</span>
+          <span class="racestat" id="raceStat"></span></h2>
+        <div class="race" id="race"></div>
+      </div>
 
   <div class="coinstrip">
     <b>$LITTER</b>
@@ -162,11 +170,7 @@
     </div>
   </div>
 
-      <div class="panel" style="margin-top:16px;" id="racePanel">
-        <h2>The race <span class="q" tabindex="0" data-tip="Each kitten's token pays a trading fee, and that fee buys the litter's food. This track shows how much each kitten has earned so far. Mama ($LITTER) runs the pace lane. Milestones are real: at each one the litter gets something on camera.">?</span>
-          <span class="racestat" id="raceStat"></span></h2>
-        <div class="race" id="race"></div>
-      </div>
+    
 
   <footer>Experiment 001 · The Litter · the pâté must flow. <span class="q" tabindex="0" data-tip="An AI agent is the stepfather of six kittens. It watches, narrates, photographs and tweets them 24/7, and trading fees on the Family's tokens pay for their food. The kittens are cared for by humans; the AI handles the internet.">?</span></footer>
 </div>
