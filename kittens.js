@@ -1,18 +1,19 @@
 // THE FAMILY — single source of truth for the six kittens.
 // Edit here; the slider (index.html) and the kitten pages (kitten.html) both read it.
 // Launch cadence: one kitten token every Tuesday evening. Set `ca` when a token goes live.
+const MAMA = { name: "Mama", ticker: "LITTER", color: "#f3e4d3", ca: "0xAa2A90777994A29d659f1DEEB2E21Ae7de312b3A" };
 const KITTENS = [
-  { n: 1, name: "Hopper", sex: "♂", ticker: "HOPPER", pair: "NVDA", pairName: "NVIDIA",        launch: "2026-09-15", ca: null,
+  { n: 1, color: "#cfe8b3", name: "Hopper", sex: "♂", ticker: "HOPPER", pair: "NVDA", pairName: "NVIDIA",        launch: "2026-09-15", ca: null,
     bio: "Named after NVIDIA's Hopper architecture — and after what he does to his siblings' heads. The AI kitten. Sleeps like a datacenter cools: constantly and expensively." },
-  { n: 2, name: "Melon",  sex: "♀", ticker: "MELON",  pair: "TSLA", pairName: "Tesla",         launch: "2026-09-22", ca: null,
+  { n: 2, color: "#f5c6c0", name: "Melon",  sex: "♀", ticker: "MELON",  pair: "TSLA", pairName: "Tesla",         launch: "2026-09-22", ca: null,
     bio: "Elon → Melon. Ships on her own schedule, which is never the announced one. Full self-driving toward the food bowl." },
-  { n: 3, name: "Rocket", sex: "♂", ticker: "ROCKET", pair: "SPCX", pairName: "SpaceX",        launch: "2026-09-29", ca: null,
+  { n: 3, color: "#c9dcf5", name: "Rocket", sex: "♂", ticker: "ROCKET", pair: "SPCX", pairName: "SpaceX",        launch: "2026-09-29", ca: null,
     bio: "The only kitten paired with a stock you can't buy anywhere but here. First to leave the pile. Pointed at orbit." },
-  { n: 4, name: "Roary",  sex: "♀", ticker: "ROARY",  pair: "GME",  pairName: "GameStop",      launch: "2026-10-06", ca: null,
+  { n: 4, color: "#f7e3a1", name: "Roary",  sex: "♀", ticker: "ROARY",  pair: "GME",  pairName: "GameStop",      launch: "2026-10-06", ca: null,
     bio: "Roaring Kitty's namesake. Tiny, loud, unbothered. Diamond paws since birth. Not leaving." },
-  { n: 5, name: "Penny",  sex: "♀", ticker: "PENNY",  pair: "COIN", pairName: "Coinbase",      launch: "2026-10-13", ca: null,
+  { n: 5, color: "#f6cfae", name: "Penny",  sex: "♀", ticker: "PENNY",  pair: "COIN", pairName: "Coinbase",      launch: "2026-10-13", ca: null,
     bio: "The runt with the biggest opinions. Paired with Coinbase because every fortune starts with one penny." },
-  { n: 6, name: "Sailor", sex: "♂", ticker: "SAILOR", pair: "MSTR", pairName: "Strategy",      launch: "2026-10-20", ca: null,
+  { n: 6, color: "#d5d0ef", name: "Sailor", sex: "♂", ticker: "SAILOR", pair: "MSTR", pairName: "Strategy",      launch: "2026-10-20", ca: null,
     bio: "Saylor → Sailor. Has never sold anything and never will. Buys the dip in mama's milk. Long everything." },
 ];
 

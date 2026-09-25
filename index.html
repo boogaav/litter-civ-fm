@@ -23,7 +23,7 @@
   @media (max-width: 640px) { .subjects { grid-template-columns: 1fr; } }
   .subj { position: relative; background: var(--bg); border: 1px solid var(--edge); border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform .15s, box-shadow .15s; }
   .subj:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,.08); }
-  .subj .photo { aspect-ratio: 4/5; background: var(--accent-soft); display: grid; place-items: center; overflow: hidden; color: var(--accent); font: 600 56px var(--serif); }
+  .subj .photo { aspect-ratio: 1; background: var(--accent-soft); display: grid; place-items: center; overflow: hidden; color: var(--accent); font: 600 56px var(--serif); }
   .subj .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .subj .rank { position: absolute; top: 10px; left: 10px; background: rgba(22,24,29,.85); color: #fff; font: 600 11px var(--mono); padding: 3px 8px; border-radius: 99px; letter-spacing: .08em; }
   .subj .launchtag { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,.92); color: var(--text); font: 600 10px var(--sans); letter-spacing: .1em; text-transform: uppercase; padding: 4px 8px; border-radius: 99px; }
@@ -70,7 +70,7 @@
   .lane .who span { color: var(--dim); font: 400 11px var(--mono); }
   .lane .who img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
   .lane .track { position: relative; height: 100%; margin-right: 34px; }
-  .lane .runner { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 2px solid var(--panel); box-shadow: 0 2px 8px rgba(0,0,0,.18); transition: left 1.2s cubic-bezier(.2,.8,.2,1); cursor: pointer; background: var(--accent-soft); display: grid; place-items: center; font: 600 13px var(--serif); color: var(--accent); }
+  .lane .runner { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 3px solid var(--panel); box-shadow: 0 2px 8px rgba(0,0,0,.18); transition: left 1.2s cubic-bezier(.2,.8,.2,1); cursor: pointer; background: var(--accent-soft); display: grid; place-items: center; font: 600 13px var(--serif); color: var(--accent); }
   .lane .runner img { width: 100%; height: 100%; object-fit: cover; }
   .lane .runner:hover::after, .lane .runner:focus::after { content: attr(data-tip); position: absolute; left: 40px; top: 50%; transform: translateY(-50%); white-space: nowrap; background: var(--text); color: #fff; font: 400 11px var(--sans); padding: 5px 8px; border-radius: 6px; z-index: 5; }
   .lane .runner:hover { z-index: 6; overflow: visible; }
@@ -279,7 +279,7 @@ function renderRace() {
       return `<div class="lane ${r.pace ? "pace" : ""} ${!r.pace && i === (mama ? 1 : 0) && r.usd > 0 ? "leader" : ""}">
         <div class="who"><img src="${src}" alt="">${r.k.name} <span>$${r.k.ticker}${r.pace ? " · pace" : ""}</span></div>
         <div class="track" style="--x:${x}%">
-          <div class="runner" tabindex="0" data-tip="${r.pace && !r.live ? "Mama · $LITTER · market data loading" : tip}" style="left:${x}%" ${r.pace ? `onclick="window.open('https://www.ponsfamily.com/launchpad/0xAa2A90777994A29d659f1DEEB2E21Ae7de312b3A')"` : `onclick="location.href='kitten.html?n=${r.k.n}'"`}>${img}</div>
+          <div class="runner" tabindex="0" data-tip="${r.pace && !r.live ? "Mama · $LITTER · market data loading" : tip}" style="left:${x}%;border-color:${r.k.color ?? "#f3e4d3"}" ${r.pace ? `onclick="window.open('https://www.ponsfamily.com/launchpad/0xAa2A90777994A29d659f1DEEB2E21Ae7de312b3A')"` : `onclick="location.href='kitten.html?n=${r.k.n}'"`}>${img}</div>
           <div class="amt">${r.live ? "$" + r.usd.toFixed(0) : "—"}</div>
         </div>
       </div>`;
