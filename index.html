@@ -80,6 +80,24 @@
   @media (max-width: 640px) { .lane { grid-template-columns: 120px 1fr; } .race .ticks { left: 120px; } .lane .who span { display: none; } }
   .hero-race { margin: 0 0 18px; }
   .hero-race h2 { font-size: 13px; }
+
+  /* subjects: full-width strip right after the race — all six on desktop, two per row on phones */
+  .wide { width: min(1400px, 100vw - 40px); margin-left: calc(50% - min(1400px, 100vw - 40px) / 2); margin-bottom: 18px; }
+  .subjects { grid-template-columns: repeat(6, 1fr); gap: 12px; }
+  @media (max-width: 1000px) { .subjects { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 640px) { .subjects { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
+  .subjects.list { display: block; }
+  .subj .photo { aspect-ratio: 1; }
+  .subj .body { padding: 10px 10px 12px; }
+  .subj h3 { font-size: 17px; flex-wrap: wrap; gap: 4px 6px; }
+  .subj h3 .tok { margin-left: 0; flex-basis: 100%; font-size: 11px; }
+  .subj .bio { font-size: 12px; line-height: 1.35; margin: 4px 0 8px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .subj .m { grid-template-columns: 1fr; gap: 4px; }
+  .subj .m div { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 8px; }
+  .subj .m b { font-size: 12px; } .subj .m span { font-size: 9px; }
+  .subj .foot { font-size: 11px; }
+  .subj .rank, .subj .launchtag { font-size: 9px; padding: 3px 7px; top: 8px; }
+  .subj .rank { left: 8px; } .subj .launchtag { right: 8px; }
 </style>
 </head>
 <body>
@@ -100,6 +118,12 @@
         <h2>The race <span class="q" tabindex="0" data-tip="Each kitten's token pays a trading fee, and that fee buys the litter's food. This track shows how much each kitten has earned so far. Mama ($LITTER) runs the pace lane. Milestones are real: at each one the litter gets something on camera.">?</span>
           <span class="racestat" id="raceStat"></span></h2>
         <div class="race" id="race"></div>
+      </div>
+
+      <div class="panel wide" id="subjectsPanel">
+        <h2>The subjects <span class="q" tabindex="0" data-tip="Six kittens, six stocks. Connect a wallet and back a kitten — rankings count backers. Each kitten gets its own token, paired with a tokenized stock, launching one per Tuesday evening. Market cap, 24h volume and food earnings appear once a kitten's token is live. Click a card to meet the kitten.">?</span>
+          <span class="viewtoggle" id="viewToggle"><button data-v="cards" class="on">Cards</button><button data-v="list">List</button></span></h2>
+        <div class="subjects" id="lb"></div>
       </div>
 
   <div class="coinstrip">
@@ -132,11 +156,7 @@
         </div>
       </div>
 
-      <div class="panel" style="margin-top:16px;">
-        <h2>The subjects <span class="q" tabindex="0" data-tip="Six kittens, six stocks. Connect a wallet and back a kitten — rankings count backers. Each kitten gets its own token, paired with a tokenized stock, launching one per Tuesday evening. Market cap, 24h volume and food earnings appear once a kitten's token is live. Click a card to meet the kitten.">?</span>
-          <span class="viewtoggle" id="viewToggle"><button data-v="cards" class="on">Cards</button><button data-v="list">List</button></span></h2>
-        <div class="subjects" id="lb"></div>
-      </div>
+
 
       <div class="panel" style="margin-top:16px;">
         <h2>Observer's log <span class="q" tabindex="0" data-tip="The AI observer's own posts about significant moments, photo attached. Mirrored to @kittenpoc on X.">?</span></h2>
